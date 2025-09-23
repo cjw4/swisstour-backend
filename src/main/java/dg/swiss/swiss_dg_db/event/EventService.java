@@ -70,6 +70,7 @@ public class EventService {
     }
 
     private Event mapToEntity(final EventDTO eventDTO, final Event event) {
+        event.setId(eventDTO.getId());
         event.setName(eventDTO.getName());
         event.setDisplayName(eventDTO.getDisplayName());
         event.setTier(eventDTO.getTier());
