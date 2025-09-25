@@ -1,6 +1,8 @@
 package dg.swiss.swiss_dg_db.player;
 
 import jakarta.validation.Valid;
+
+import java.io.IOException;
 import java.util.List;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -36,8 +38,9 @@ public class PlayerResource {
     }
 
     @PostMapping
-    public ResponseEntity<Long> createPlayer(@RequestBody @Valid final PlayerDTO playerDTO) {
-        final Long createdId = playerService.create(playerDTO);
+    public ResponseEntity<Long> createPlayer(@RequestBody @Valid final PlayerDTO playerDTO) throws IOException {
+        PlayerDTO playerDTOwDetails = playerService.addDetails(playerDTO);
+        final Long createdId = playerService.create(playerDTOwDetails);
         return new ResponseEntity<>(createdId, HttpStatus.CREATED);
     }
 

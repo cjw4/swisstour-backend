@@ -13,11 +13,9 @@ public class PlayerDTO {
 
     private Long id;
 
-    @NotNull
     @Size(max = 255)
     private String firstname;
 
-    @NotNull
     @Size(max = 255)
     private String lastname;
 
@@ -30,7 +28,6 @@ public class PlayerDTO {
     @NotNull
     private Boolean swisstourLicense;
 
-    @NotNull
     @JsonProperty("isPro")
     private Boolean isPro;
 
