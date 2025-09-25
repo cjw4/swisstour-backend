@@ -1,10 +1,13 @@
 package dg.swiss.swiss_dg_db.event;
 
 import dg.swiss.swiss_dg_db.events.BeforeDeleteEvent;
+import dg.swiss.swiss_dg_db.player.PlayerDTO;
+import dg.swiss.swiss_dg_db.player.PlayerService;
 import dg.swiss.swiss_dg_db.scrape.EventDetails;
 import dg.swiss.swiss_dg_db.util.NotFoundException;
 
 import java.io.IOException;
+import java.sql.SQLOutput;
 import java.util.List;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Sort;
@@ -17,13 +20,16 @@ public class EventService {
     private final EventRepository eventRepository;
     private final ApplicationEventPublisher publisher;
     private final EventDetails eventDetails;
+    private final PlayerService playerService;
 
     public EventService(final EventRepository eventRepository,
                         final ApplicationEventPublisher publisher,
-                        final EventDetails eventDetails) {
+                        final EventDetails eventDetails,
+                        final PlayerService playerService) {
         this.eventRepository = eventRepository;
         this.publisher = publisher;
         this.eventDetails = eventDetails;
+        this.playerService = playerService;
     }
 
     public List<EventDTO> findAll() {
@@ -50,6 +56,28 @@ public class EventService {
         eventDTO.setCity(eventDetails.getCity());
         eventDTO.setCountry(eventDetails.getCountry());
         return eventDTO;
+    }
+
+    public void addTournaments(final Long id) throws IOException {
+        eventDetails.scrapeEventInfo(id);
+        eventDetails.scrapeEventResults(id);
+        // This is where I would add the tournaments into the database
+        eventDetails.getTournaments().forEach(tournamentDetail -> {
+                 Long pdgaNumber = tournamentDetail.getPdgaNumber();
+                 if (pdgaNumber != null && !playerService.pdgaNumberExists(pdgaNumber)) {
+                     PlayerDTO playerDTO = new PlayerDTO();
+                     playerDTO.setPdgaNumber(pdgaNumber);
+                     try {
+                         Thread.sleep(2000);
+                         playerService.addDetails(playerDTO);
+                     } catch (IOException | InterruptedException e) {
+                         throw new RuntimeException(e);
+                     }
+                     playerDTO.setSwisstourLicense(false);
+                     System.out.println("Adding Player: " + playerDTO.getFirstname() + " " + playerDTO.getLastname());
+                     playerService.create(playerDTO);
+                 }
+                });
     }
 
     public Long create(final EventDTO eventDTO) {

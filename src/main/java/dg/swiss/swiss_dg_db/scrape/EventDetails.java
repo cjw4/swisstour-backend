@@ -1,15 +1,19 @@
 package dg.swiss.swiss_dg_db.scrape;
 
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
+import java.util.ArrayList;
+import java.util.List;
 
 @Component
 @Setter
@@ -25,6 +29,7 @@ public class EventDetails {
     private Integer numberPlayers;
     private Double points;
     private Double purse;
+    private List<TournamentDetail> tournaments;
 
     public void scrapeEventInfo(Long eventId) throws IOException {
         // get the DOM of the event
@@ -111,6 +116,91 @@ public class EventDetails {
             return Double.parseDouble(purseElement.text().replace("$", "").replace(",", "").trim());
         } else {
             return 0.00;
+        }
+    }
+
+    public void scrapeEventResults(Long eventId) throws IOException {
+        // get the DOM of the event
+        Document document = Jsoup.connect(baseUrl + eventId).get();
+        // scrape for the tournaments
+        this.tournaments = scrapeTournaments(document);
+    }
+
+    @AllArgsConstructor
+    @Getter
+    public static class TournamentDetail {
+        private String name;
+        private Long pdgaNumber;
+        private String division;
+        private Integer score;
+        private Integer place;
+        private Double prize;
+    }
+
+    public static List<TournamentDetail> scrapeTournaments(Document document) throws IOException {
+        Element results = document.selectFirst(".leaderboard");
+        List<TournamentDetail> tournamentDetails = new ArrayList<>();
+
+        assert results != null;
+        Elements categories = results.select("details");
+        for (Element c : categories) {
+            Element divisionElement = c.selectFirst(".division");
+            if (divisionElement != null) {
+                String division = divisionElement.text().split(" ")[0];
+
+                Elements tournamentsOdd = c.select(".odd");
+                Elements tournamentsEven = c.select(".even");
+
+                List<Element> tournaments = new ArrayList<>();
+                tournaments.addAll(tournamentsOdd);
+                tournaments.addAll(tournamentsEven);
+
+                for (Element tournament : tournaments) {
+                    TournamentDetail tournamentDetail = parseTournament(tournament, division);
+                    if (tournamentDetail != null) {
+                        tournamentDetails.add(tournamentDetail);
+                    }
+                }
+            }
+        }
+        return tournamentDetails;
+    }
+
+    private static TournamentDetail parseTournament(Element tournament, String division) {
+        try {
+            String placeText = tournament.selectFirst(".place").text();
+            Integer place;
+            if (placeText != null && placeText != "DNF") {
+                place = Integer.parseInt(placeText);
+            } else {
+                place = null;
+            }
+
+            String name = tournament.select(".player").text();
+            String pdgaNumberString = tournament.select(".pdga-number").text();
+            Long pdgaNumber;
+            if (!pdgaNumberString.isEmpty()) {
+                pdgaNumber = Long.parseLong(pdgaNumberString);
+            } else {
+                pdgaNumber = null;
+            }
+            String scoreString = tournament.select(".total").text();
+            Integer score;
+            if (!scoreString.isEmpty()) {
+                score = Integer.parseInt(scoreString);
+            } else {
+                score = null;
+            }
+            String prizeString = tournament.select(".prize").text();
+            Double prize;
+            if (!prizeString.isEmpty()) {
+                prize = Double.parseDouble(prizeString.replace("$", "").replace(",", "").trim());
+            } else {
+                prize = null;
+            }
+            return new TournamentDetail(name, pdgaNumber, division, score, place, prize);
+        } catch (Exception e) {
+            return null;
         }
     }
 }

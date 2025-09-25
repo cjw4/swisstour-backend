@@ -1,5 +1,6 @@
 package dg.swiss.swiss_dg_db.event;
 
+import dg.swiss.swiss_dg_db.scrape.EventDetails;
 import jakarta.validation.Valid;
 
 import java.io.IOException;
@@ -42,6 +43,12 @@ public class EventResource {
         EventDTO eventDTOwDetails = eventService.addDetails(eventDTO);
         final Long createdId = eventService.create(eventDTOwDetails);
         return new ResponseEntity<>(createdId, HttpStatus.CREATED);
+    }
+
+    @PostMapping("/results/{id}")
+    public ResponseEntity<Long> getEventResults(@PathVariable(name = "id") final Long id) throws IOException {
+        eventService.addTournaments(id);
+        return new ResponseEntity<>(id, HttpStatus.OK);
     }
 
     @PutMapping("/{id}")
