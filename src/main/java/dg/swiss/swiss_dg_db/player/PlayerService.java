@@ -39,11 +39,12 @@ public class PlayerService {
     }
 
     public PlayerDTO addDetails(PlayerDTO playerDTO) throws IOException {
-        playerDetails.scrapePlayerInfo(playerDTO.getPdgaNumber());
-        playerDTO.setPdgaNumber(playerDetails.getPdgaNumber());
-        playerDTO.setFirstname(playerDetails.getFirstname());
-        playerDTO.setLastname(playerDetails.getLastname());
-        playerDTO.setIsPro(playerDetails.getIsPro());
+        if (playerDTO.getPdgaNumber() != null) {
+            playerDetails.scrapePlayerInfo(playerDTO.getPdgaNumber());
+            playerDTO.setFirstname(playerDetails.getFirstname());
+            playerDTO.setLastname(playerDetails.getLastname());
+            playerDTO.setIsPro(playerDetails.getIsPro());
+        }
         return playerDTO;
     }
 
