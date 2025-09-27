@@ -49,7 +49,11 @@ public class TournamentService {
     public Long create(final TournamentDTO tournamentDTO) {
         final Tournament tournament = new Tournament();
         mapToEntity(tournamentDTO, tournament);
-        return tournamentRepository.save(tournament).getId();
+        if (!tournamentRepository.existsByPlayerIdAndEventId(tournamentDTO.getPlayer(), tournamentDTO.getEvent())) {
+            System.out.println("Adding Tournament Results: " + tournamentDTO.getPlayer() + " " + tournamentDTO.getEvent());
+            return tournamentRepository.save(tournament).getId();
+        }
+        return 0L;
     }
 
     public void update(final Long id, final TournamentDTO tournamentDTO) {

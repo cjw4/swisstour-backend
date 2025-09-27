@@ -9,4 +9,7 @@ public interface TournamentRepository extends JpaRepository<Tournament, Long> {
 
     Tournament findFirstByPlayerId(Long id);
 
+    boolean existsByPlayerIdAndEventId(Long playerId, Long eventId);
+
+
 }

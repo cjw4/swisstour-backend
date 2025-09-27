@@ -1,6 +1,10 @@
 package dg.swiss.swiss_dg_db.event;
 
+import dg.swiss.swiss_dg_db.player.PlayerDTO;
+import dg.swiss.swiss_dg_db.player.PlayerResource;
+import dg.swiss.swiss_dg_db.player.PlayerService;
 import dg.swiss.swiss_dg_db.scrape.EventDetails;
+import dg.swiss.swiss_dg_db.scrape.NameConverter;
 import jakarta.validation.Valid;
 
 import java.io.IOException;
@@ -23,9 +27,15 @@ import org.springframework.web.bind.annotation.RestController;
 public class EventResource {
 
     private final EventService eventService;
+    private final PlayerService playerService;
+    private final EventRepository eventRepository;
 
-    public EventResource(final EventService eventService) {
+    public EventResource(final EventService eventService,
+                         final PlayerService playerService,
+                         final EventRepository eventRepository) {
         this.eventService = eventService;
+        this.playerService = playerService;
+        this.eventRepository = eventRepository;
     }
 
     @GetMapping
@@ -47,7 +57,17 @@ public class EventResource {
 
     @PostMapping("/results/{id}")
     public ResponseEntity<Long> getEventResults(@PathVariable(name = "id") final Long id) throws IOException {
-        eventService.addTournaments(id);
+        if (!eventRepository.existsById(id)) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+        EventDetails eventDetails = eventService.addTournaments(id);
+
+        eventDetails.getTournaments().forEach(tournamentDetail -> {
+            eventService.addPlayerFromEvent(tournamentDetail);
+            eventService.addTournamentFromEvent(id, tournamentDetail);
+        });
+
+
         return new ResponseEntity<>(id, HttpStatus.OK);
     }
 

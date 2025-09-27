@@ -4,10 +4,12 @@ import dg.swiss.swiss_dg_db.events.BeforeDeleteEvent;
 import dg.swiss.swiss_dg_db.player.PlayerDTO;
 import dg.swiss.swiss_dg_db.player.PlayerService;
 import dg.swiss.swiss_dg_db.scrape.EventDetails;
+import dg.swiss.swiss_dg_db.scrape.NameConverter;
+import dg.swiss.swiss_dg_db.tournament.TournamentDTO;
+import dg.swiss.swiss_dg_db.tournament.TournamentService;
 import dg.swiss.swiss_dg_db.util.NotFoundException;
 
 import java.io.IOException;
-import java.sql.SQLOutput;
 import java.util.List;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Sort;
@@ -21,15 +23,17 @@ public class EventService {
     private final ApplicationEventPublisher publisher;
     private final EventDetails eventDetails;
     private final PlayerService playerService;
+    private final TournamentService tournamentService;
 
     public EventService(final EventRepository eventRepository,
                         final ApplicationEventPublisher publisher,
                         final EventDetails eventDetails,
-                        final PlayerService playerService) {
+                        final PlayerService playerService, TournamentService tournamentService) {
         this.eventRepository = eventRepository;
         this.publisher = publisher;
         this.eventDetails = eventDetails;
         this.playerService = playerService;
+        this.tournamentService = tournamentService;
     }
 
     public List<EventDTO> findAll() {
@@ -58,26 +62,63 @@ public class EventService {
         return eventDTO;
     }
 
-    public void addTournaments(final Long id) throws IOException {
+    public EventDetails addTournaments(final Long id) throws IOException {
         eventDetails.scrapeEventInfo(id);
         eventDetails.scrapeEventResults(id);
-        // This is where I would add the tournaments into the database
-        eventDetails.getTournaments().forEach(tournamentDetail -> {
-                 Long pdgaNumber = tournamentDetail.getPdgaNumber();
-                 if (pdgaNumber != null && !playerService.pdgaNumberExists(pdgaNumber)) {
-                     PlayerDTO playerDTO = new PlayerDTO();
-                     playerDTO.setPdgaNumber(pdgaNumber);
-                     try {
-                         Thread.sleep(2000);
-                         playerService.addDetails(playerDTO);
-                     } catch (IOException | InterruptedException e) {
-                         throw new RuntimeException(e);
-                     }
-                     playerDTO.setSwisstourLicense(false);
-                     System.out.println("Adding Player: " + playerDTO.getFirstname() + " " + playerDTO.getLastname());
-                     playerService.create(playerDTO);
-                 }
-                });
+        return eventDetails;
+    }
+
+    public void addPlayerFromEvent(EventDetails.TournamentDetail tournamentDetail) {
+        // Add player to database if not yet there
+        Long pdgaNumber = tournamentDetail.getPdgaNumber();
+        String name = tournamentDetail.getName();
+        PlayerDTO playerDTO = new PlayerDTO();
+        // Search by PDGA Number
+        if (pdgaNumber != null && !playerService.pdgaNumberExists(pdgaNumber)) {
+            playerDTO.setPdgaNumber(pdgaNumber);
+            try {
+                Thread.sleep(2000);
+                playerService.addDetails(playerDTO);
+            } catch (IOException | InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+            playerDTO.setSwisstourLicense(false);
+            System.out.println("Adding Player: " + playerDTO.getFirstname() + " " + playerDTO.getLastname());
+            playerService.create(playerDTO);
+            // Search by Name
+        } else if (pdgaNumber == null && !playerService.nameExists(name)) {
+            String[] names = name.trim().split("\\s+");
+            NameConverter.NameInfo nameInfo = NameConverter.splitName(names);
+            playerDTO.setFirstname(nameInfo.getFirstName());
+            playerDTO.setLastname(nameInfo.getLastName());
+            playerDTO.setIsPro(false);
+            playerDTO.setSwisstourLicense(false);
+            System.out.println("Adding Player: " + playerDTO.getFirstname() + " " + playerDTO.getLastname());
+            playerService.create(playerDTO);
+        }
+    }
+
+    public void addTournamentFromEvent(Long eventId,
+                                       EventDetails.TournamentDetail tournamentDetail) {
+        Long pdgaNumber = tournamentDetail.getPdgaNumber();
+        String name = tournamentDetail.getName();
+        Long playerId = null;
+        if (pdgaNumber != null && playerService.pdgaNumberExists(pdgaNumber)) {
+            PlayerDTO playerDTO = playerService.findByPdgaNumber(pdgaNumber);
+            playerId = playerDTO.getId();
+        } else if (pdgaNumber == null && playerService.nameExists(name)) {
+            PlayerDTO playerDTO = playerService.findByName(name);
+            playerId = playerDTO.getId();
+        }
+        // Create TournamentDTO
+        TournamentDTO tournamentDTO = new TournamentDTO();
+        tournamentDTO.setEvent(eventId);
+        tournamentDTO.setPlayer(playerId);
+        tournamentDTO.setDivision(tournamentDetail.getDivision());
+        tournamentDTO.setPlace(tournamentDetail.getPlace());
+        tournamentDTO.setPrize(tournamentDetail.getPrize());
+        tournamentDTO.setScore(tournamentDetail.getScore());
+        tournamentService.create(tournamentDTO);
     }
 
     public Long create(final EventDTO eventDTO) {
@@ -133,5 +174,4 @@ public class EventService {
         event.setIsSwisstour(eventDTO.getIsSwisstour());
         return event;
     }
-
 }

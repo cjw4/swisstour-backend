@@ -1,6 +1,7 @@
 package dg.swiss.swiss_dg_db.player;
 
 import dg.swiss.swiss_dg_db.events.BeforeDeletePlayer;
+import dg.swiss.swiss_dg_db.scrape.NameConverter;
 import dg.swiss.swiss_dg_db.scrape.PlayerDetails;
 import dg.swiss.swiss_dg_db.util.NotFoundException;
 
@@ -97,4 +98,29 @@ public class PlayerService {
         return playerRepository.existsBySdaNumber(sdaNumber);
     }
 
+    public boolean nameExists(final String fullName) {
+        if (fullName == null || fullName.trim().isEmpty()) {
+            return false;
+        }
+        String[] names = fullName.trim().split("\\s+");
+        if (names.length < 2) {
+            return false;
+        }
+        NameConverter.NameInfo nameInfo = NameConverter.splitName(names);
+        return playerRepository.existsByFirstnameAndLastname(nameInfo.getFirstName(), nameInfo.getLastName());
+    }
+
+    public PlayerDTO findByPdgaNumber(Long pdgaNumber) {
+        Player player = playerRepository.findByPdgaNumber(pdgaNumber)
+                .orElseThrow(() -> new NotFoundException("Player not found"));
+        return mapToDTO(player, new PlayerDTO());
+    }
+
+    public PlayerDTO findByName(String fullName) {
+        String[] names = fullName.trim().split("\\s+");
+        NameConverter.NameInfo nameInfo = NameConverter.splitName(names);
+        Player player = playerRepository.findByFirstnameAndLastname(nameInfo.getFirstName(), nameInfo.getLastName())
+                .orElseThrow(() -> new NotFoundException("Player not found"));
+        return mapToDTO(player, new PlayerDTO());
+    }
 }
