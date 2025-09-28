@@ -52,8 +52,9 @@ public class TournamentService {
         if (!tournamentRepository.existsByPlayerIdAndEventId(tournamentDTO.getPlayer(), tournamentDTO.getEvent())) {
             System.out.println("Adding Tournament Results: " + tournamentDTO.getPlayer() + " " + tournamentDTO.getEvent());
             return tournamentRepository.save(tournament).getId();
+        } else {
+            return tournamentRepository.findByPlayerIdAndEventId(tournamentDTO.getPlayer(), tournamentDTO.getEvent()).getId();
         }
-        return 0L;
     }
 
     public void update(final Long id, final TournamentDTO tournamentDTO) {

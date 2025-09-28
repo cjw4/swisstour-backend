@@ -14,6 +14,7 @@ import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Component
 @Setter
@@ -135,6 +136,15 @@ public class EventDetails {
         private Integer score;
         private Integer place;
         private Double prize;
+        private List<RoundDetail> rounds;
+    }
+
+    @AllArgsConstructor
+    @Getter
+    public static class RoundDetail {
+        private Integer roundNumber;
+        private Integer score;
+        private Integer rating;
     }
 
     public static List<TournamentDetail> scrapeTournaments(Document document) throws IOException {
@@ -168,9 +178,15 @@ public class EventDetails {
 
     private static TournamentDetail parseTournament(Element tournament, String division) {
         try {
-            String placeText = tournament.selectFirst(".place").text();
+            Element placeElement = tournament.selectFirst(".place");
+            String placeText;
+            if (placeElement != null) {
+                placeText = placeElement.text().trim();
+            } else {
+                placeText = "";
+            }
             Integer place;
-            if (placeText != null && placeText != "DNF") {
+            if (!placeText.isEmpty()) {
                 place = Integer.parseInt(placeText);
             } else {
                 place = null;
@@ -186,7 +202,7 @@ public class EventDetails {
             }
             String scoreString = tournament.select(".total").text();
             Integer score;
-            if (!scoreString.isEmpty()) {
+            if (!scoreString.equals("DNF") && !scoreString.isEmpty()) {
                 score = Integer.parseInt(scoreString);
             } else {
                 score = null;
@@ -198,7 +214,30 @@ public class EventDetails {
             } else {
                 prize = null;
             }
-            return new TournamentDetail(name, pdgaNumber, division, score, place, prize);
+            // Scrape rounds
+            Elements roundScores = tournament.select("td.round > a.score");
+            Elements roundRatings = tournament.select("td.round-rating");
+
+            List<RoundDetail> rounds = new ArrayList<>();
+            for (int i = 0; i < roundScores.size(); i++) {
+                Integer roundScore = null;
+                Integer roundRating = null;
+                try {
+                    String scoreText = roundScores.get(i).text().trim();
+                    if (!scoreText.isEmpty()) {
+                        roundScore = Integer.parseInt(scoreText);
+                    }
+                } catch (Exception ignored) {}
+                try {
+                    String ratingText = roundRatings.get(i).text().trim();
+                    if (!ratingText.isEmpty()) {
+                        roundRating = Integer.parseInt(ratingText);
+                    }
+                } catch (Exception ignored) {}
+                rounds.add(new RoundDetail(i+1, roundScore, roundRating));
+            }
+
+            return new TournamentDetail(name, pdgaNumber, division, score, place, prize, rounds);
         } catch (Exception e) {
             return null;
         }

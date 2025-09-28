@@ -7,4 +7,5 @@ public interface RoundRepository extends JpaRepository<Round, Long> {
 
     Round findFirstByTournamentId(Long id);
 
+    boolean existsByTournamentId(Long id);
 }

@@ -3,6 +3,9 @@ package dg.swiss.swiss_dg_db.event;
 import dg.swiss.swiss_dg_db.events.BeforeDeleteEvent;
 import dg.swiss.swiss_dg_db.player.PlayerDTO;
 import dg.swiss.swiss_dg_db.player.PlayerService;
+import dg.swiss.swiss_dg_db.round.RoundDTO;
+import dg.swiss.swiss_dg_db.round.RoundRepository;
+import dg.swiss.swiss_dg_db.round.RoundResource;
 import dg.swiss.swiss_dg_db.scrape.EventDetails;
 import dg.swiss.swiss_dg_db.scrape.NameConverter;
 import dg.swiss.swiss_dg_db.tournament.TournamentDTO;
@@ -24,16 +27,22 @@ public class EventService {
     private final EventDetails eventDetails;
     private final PlayerService playerService;
     private final TournamentService tournamentService;
+    private final RoundResource roundResource;
+    private final RoundRepository roundRepository;
 
     public EventService(final EventRepository eventRepository,
                         final ApplicationEventPublisher publisher,
                         final EventDetails eventDetails,
-                        final PlayerService playerService, TournamentService tournamentService) {
+                        final PlayerService playerService,
+                        final TournamentService tournamentService,
+                        final RoundResource roundResource, RoundRepository roundRepository) {
         this.eventRepository = eventRepository;
         this.publisher = publisher;
         this.eventDetails = eventDetails;
         this.playerService = playerService;
         this.tournamentService = tournamentService;
+        this.roundResource = roundResource;
+        this.roundRepository = roundRepository;
     }
 
     public List<EventDTO> findAll() {
@@ -118,7 +127,19 @@ public class EventService {
         tournamentDTO.setPlace(tournamentDetail.getPlace());
         tournamentDTO.setPrize(tournamentDetail.getPrize());
         tournamentDTO.setScore(tournamentDetail.getScore());
-        tournamentService.create(tournamentDTO);
+        Long tournamentId = tournamentService.create(tournamentDTO);
+        if (tournamentId != null && !roundRepository.existsByTournamentId(tournamentId)) {
+            // Create RoundDTOs
+            List<EventDetails.RoundDetail> rounds = tournamentDetail.getRounds();
+            for (EventDetails.RoundDetail roundDetail : rounds) {
+                RoundDTO roundDTO = new RoundDTO();
+                roundDTO.setRoundNumber(roundDetail.getRoundNumber());
+                roundDTO.setScore(roundDetail.getScore());
+                roundDTO.setRating(roundDetail.getRating());
+                roundDTO.setTournament(tournamentId);
+                roundResource.createRound(roundDTO);
+            }
+        }
     }
 
     public Long create(final EventDTO eventDTO) {
