@@ -125,7 +125,7 @@ public class EventDetails {
 
     private Double scrapePurse(Document document) {
         Element purseElement = document.selectFirst("td.purse");
-        if (purseElement != null) {
+        if (purseElement != null && !purseElement.text().equals("Projected payout")) {
             return Double.parseDouble(purseElement.text().replace("$", "").replace(",", "").trim());
         } else {
             return 0.00;

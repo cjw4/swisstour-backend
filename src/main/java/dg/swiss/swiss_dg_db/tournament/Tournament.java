@@ -3,17 +3,8 @@ package dg.swiss.swiss_dg_db.tournament;
 import dg.swiss.swiss_dg_db.event.Event;
 import dg.swiss.swiss_dg_db.player.Player;
 import dg.swiss.swiss_dg_db.round.Round;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToMany;
-import jakarta.persistence.SequenceGenerator;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
+
 import java.util.HashSet;
 import java.util.Set;
 import lombok.Getter;
@@ -53,7 +44,7 @@ public class Tournament {
     @JoinColumn(name = "event_id", nullable = false)
     private Event event;
 
-    @OneToMany(mappedBy = "tournament")
+    @OneToMany(mappedBy = "tournament", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<Round> rounds = new HashSet<>();
 
     @ManyToOne(fetch = FetchType.LAZY)

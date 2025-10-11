@@ -1,14 +1,8 @@
 package dg.swiss.swiss_dg_db.event;
 
 import dg.swiss.swiss_dg_db.tournament.Tournament;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.OneToMany;
-import jakarta.persistence.SequenceGenerator;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
+
 import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.Set;
@@ -62,7 +56,7 @@ public class Event {
     @Column(nullable = false)
     private Boolean isSwisstour;
 
-    @OneToMany(mappedBy = "event")
+    @OneToMany(mappedBy = "event", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<Tournament> tournaments = new HashSet<>();
 
 }

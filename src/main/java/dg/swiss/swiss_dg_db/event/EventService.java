@@ -142,10 +142,11 @@ public class EventService {
         }
     }
 
-    public Long create(final EventDTO eventDTO) {
+    public EventDTO create(final EventDTO eventDTO) {
         final Event event = new Event();
         mapToEntity(eventDTO, event);
-        return eventRepository.save(event).getId();
+        eventRepository.save(event);
+        return eventDTO;
     }
 
     public void update(final Long id, final EventDTO eventDTO) {
