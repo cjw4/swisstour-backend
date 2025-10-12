@@ -1,5 +1,6 @@
 package dg.swiss.swiss_dg_db.event;
 
+import dg.swiss.swiss_dg_db.exceptions.EventAlreadyExistsException;
 import dg.swiss.swiss_dg_db.player.PlayerDTO;
 import dg.swiss.swiss_dg_db.player.PlayerResource;
 import dg.swiss.swiss_dg_db.player.PlayerService;
@@ -43,9 +44,12 @@ public class EventResource {
 
     @PostMapping
     public ResponseEntity<EventDTO> createEvent(@RequestBody @Valid final EventDTO eventDTO) throws IOException {
-        EventDTO eventDTOwDetails = eventService.addDetails(eventDTO);
-        eventService.create(eventDTOwDetails);
-        return new ResponseEntity<>(eventDTOwDetails, HttpStatus.CREATED);
+        if (!eventRepository.existsEventById(eventDTO.getId())) {
+            EventDTO eventDTOwDetails = eventService.addDetails(eventDTO);
+            eventService.create(eventDTOwDetails);
+            return new ResponseEntity<>(eventDTOwDetails, HttpStatus.CREATED);
+        }
+        throw new EventAlreadyExistsException();
     }
 
     @PostMapping("/results/{id}")
