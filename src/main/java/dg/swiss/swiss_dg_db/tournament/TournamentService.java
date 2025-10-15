@@ -78,6 +78,7 @@ public class TournamentService {
         tournamentDTO.setRating(tournament.getRating());
         tournamentDTO.setPrize(tournament.getPrize());
         tournamentDTO.setScore(tournament.getScore());
+        tournamentDTO.setPoints(tournament.getPoints());
         tournamentDTO.setEvent(tournament.getEvent() == null ? null : tournament.getEvent().getId());
         tournamentDTO.setPlayer(tournament.getPlayer() == null ? null : tournament.getPlayer().getId());
         return tournamentDTO;
@@ -89,6 +90,7 @@ public class TournamentService {
         tournament.setRating(tournamentDTO.getRating());
         tournament.setPrize(tournamentDTO.getPrize());
         tournament.setScore(tournamentDTO.getScore());
+        tournament.setPoints(tournamentDTO.getPoints());
         final Event event = tournamentDTO.getEvent() == null ? null : eventRepository.findById(tournamentDTO.getEvent())
                 .orElseThrow(() -> new NotFoundException("event not found"));
         tournament.setEvent(event);

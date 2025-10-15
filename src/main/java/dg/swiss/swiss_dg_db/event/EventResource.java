@@ -21,14 +21,12 @@ import org.springframework.web.bind.annotation.*;
 public class EventResource {
 
     private final EventService eventService;
-    private final PlayerService playerService;
     private final EventRepository eventRepository;
 
     public EventResource(final EventService eventService,
                          final PlayerService playerService,
                          final EventRepository eventRepository) {
         this.eventService = eventService;
-        this.playerService = playerService;
         this.eventRepository = eventRepository;
     }
 

@@ -12,9 +12,11 @@ import org.jsoup.select.Elements;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
+import java.sql.SQLOutput;
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 @Component
@@ -133,15 +135,16 @@ public class EventDetails {
         }
     }
 
-    public void scrapeEventResults(Long eventId) throws IOException {
+    public void scrapeEventResults(Long eventId, Integer points) throws IOException {
         // get the DOM of the event
         Document document = Jsoup.connect(baseUrl + eventId).get();
         // scrape for the tournaments
-        this.tournaments = scrapeTournaments(document);
+        this.tournaments = scrapeTournaments(document, points);
     }
 
     @AllArgsConstructor
     @Getter
+    @Setter
     public static class TournamentDetail {
         private String name;
         private Long pdgaNumber;
@@ -149,6 +152,7 @@ public class EventDetails {
         private Integer score;
         private Integer place;
         private Double prize;
+        private Double points;
         private List<RoundDetail> rounds;
     }
 
@@ -160,7 +164,7 @@ public class EventDetails {
         private Integer rating;
     }
 
-    public static List<TournamentDetail> scrapeTournaments(Document document) throws IOException {
+    public static List<TournamentDetail> scrapeTournaments(Document document, Integer points) {
         Element results = document.selectFirst(".leaderboard");
         List<TournamentDetail> tournamentDetails = new ArrayList<>();
 
@@ -178,15 +182,38 @@ public class EventDetails {
                 tournaments.addAll(tournamentsOdd);
                 tournaments.addAll(tournamentsEven);
 
+                // Add points
+                HashMap<Integer, Double> pts = createPtsDict(points, tournamentDetails.size());
+
                 for (Element tournament : tournaments) {
                     TournamentDetail tournamentDetail = parseTournament(tournament, division);
                     if (tournamentDetail != null) {
+                        tournamentDetail.setPoints(pts.get(tournamentDetail.getPlace()));
                         tournamentDetails.add(tournamentDetail);
                     }
                 }
             }
         }
         return tournamentDetails;
+    }
+
+    private static HashMap<Integer, Double> createPtsDict(double scale, Integer noPlayers) {
+        HashMap<Integer, Double> pointsMap = new HashMap<>();
+        // Base points defined within this method
+        int[] basePoints = {100, 90, 81, 73, 66, 60, 55, 50, 46, 42,
+                38, 35, 32, 29, 26, 23, 21, 19,
+                17, 15, 13, 11, 10, 9, 8, 7, 6, 5};
+        for (int i = 0; i < basePoints.length; i++) {
+            // Multiply by scale factor based on input
+            pointsMap.put(i + 1, basePoints[i] * (scale / 100));
+        }
+        // Determine the minimum points for additional players
+        double minPoints = 5 * (scale / 100);
+        // Populate points for players above 28
+        for (int i = 29; i <= noPlayers; i++) {
+            pointsMap.put(i, minPoints); // Assign minimum points
+        }
+        return pointsMap;
     }
 
     private static TournamentDetail parseTournament(Element tournament, String division) {
@@ -250,7 +277,7 @@ public class EventDetails {
                 rounds.add(new RoundDetail(i+1, roundScore, roundRating));
             }
 
-            return new TournamentDetail(name, pdgaNumber, division, score, place, prize, rounds);
+            return new TournamentDetail(name, pdgaNumber, division, score, place, prize, null,rounds);
         } catch (Exception e) {
             return null;
         }

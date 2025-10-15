@@ -75,7 +75,7 @@ public class EventService {
 
     public EventDetails addTournaments(final Long id) throws IOException {
         eventDetails.scrapeEventInfo(id);
-        eventDetails.scrapeEventResults(id);
+        eventDetails.scrapeEventResults(id, eventRepository.findById(id).get().getPoints());
         return eventDetails;
     }
 
@@ -128,6 +128,7 @@ public class EventService {
         tournamentDTO.setDivision(tournamentDetail.getDivision());
         tournamentDTO.setPlace(tournamentDetail.getPlace());
         tournamentDTO.setPrize(tournamentDetail.getPrize());
+        tournamentDTO.setPoints(tournamentDetail.getPoints());
         tournamentDTO.setScore(tournamentDetail.getScore());
         Long tournamentId = tournamentService.create(tournamentDTO);
         if (tournamentId != null && !roundRepository.existsByTournamentId(tournamentId)) {

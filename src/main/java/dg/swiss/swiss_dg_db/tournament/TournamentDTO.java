@@ -25,6 +25,8 @@ public class TournamentDTO {
 
     private Integer score;
 
+    private Double points;
+
     @NotNull
     private Long event;
 
