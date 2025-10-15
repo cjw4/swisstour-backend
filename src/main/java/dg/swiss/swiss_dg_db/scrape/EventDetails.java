@@ -1,5 +1,6 @@
 package dg.swiss.swiss_dg_db.scrape;
 
+import dg.swiss.swiss_dg_db.exceptions.EventDoesNotExistException;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
@@ -40,7 +41,7 @@ public class EventDetails {
             // Continue processing if no exception
         } catch (org.jsoup.HttpStatusException e) {
             if (e.getStatusCode() == 404) {
-                throw new IOException("Event not found on PDGA website");
+                throw new EventDoesNotExistException();
             } else {
                 throw e;
             }
