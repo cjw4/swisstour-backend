@@ -14,6 +14,7 @@ import dg.swiss.swiss_dg_db.util.NotFoundException;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Optional;
 
 import jakarta.transaction.Transactional;
 import org.springframework.context.ApplicationEventPublisher;
@@ -150,6 +151,13 @@ public class EventService {
         }
     }
 
+    public void toggleHasResults(final Long id) {
+        eventRepository.findById(id).ifPresent(e -> {
+            e.setHasResults(true);
+            eventRepository.save(e);
+        });
+    }
+
     public EventDTO create(final EventDTO eventDTO) {
         final Event event = new Event();
         mapToEntity(eventDTO, event);
@@ -186,6 +194,7 @@ public class EventService {
         eventDTO.setPurse(event.getPurse());
         eventDTO.setIsChampionship(event.getIsChampionship());
         eventDTO.setIsSwisstour(event.getIsSwisstour());
+        eventDTO.setHasResults(event.getHasResults());
         return eventDTO;
     }
 
@@ -203,6 +212,7 @@ public class EventService {
         event.setPurse(eventDTO.getPurse());
         event.setIsChampionship(eventDTO.getIsChampionship());
         event.setIsSwisstour(eventDTO.getIsSwisstour());
+        event.setHasResults(false);
         return event;
     }
 }

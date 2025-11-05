@@ -66,6 +66,7 @@ public class EventResource {
             }
             eventService.addTournamentFromEvent(id, tournamentDetail);
         });
+        eventService.toggleHasResults(id);
         return new ResponseEntity<>(id, HttpStatus.OK);
     }
 

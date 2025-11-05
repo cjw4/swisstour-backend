@@ -48,4 +48,7 @@ public class EventDTO {
     @JsonProperty("isSwisstour")
     private Boolean isSwisstour;
 
+    @JsonProperty("hasResults")
+    private Boolean hasResults;
+
 }

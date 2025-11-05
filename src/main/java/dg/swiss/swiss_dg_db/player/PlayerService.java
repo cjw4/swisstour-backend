@@ -7,6 +7,8 @@ import dg.swiss.swiss_dg_db.util.NotFoundException;
 
 import java.io.IOException;
 import java.util.List;
+
+import jakarta.transaction.Transactional;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
@@ -64,6 +66,7 @@ public class PlayerService {
         playerRepository.save(player);
     }
 
+    @Transactional
     public void delete(final Long id) {
         final Player player = playerRepository.findById(id)
                 .orElseThrow(NotFoundException::new);

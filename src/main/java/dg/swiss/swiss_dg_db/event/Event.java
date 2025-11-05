@@ -56,6 +56,9 @@ public class Event {
     @Column(nullable = false)
     private Boolean isSwisstour;
 
+    @Column(nullable = false, columnDefinition = "boolean default false")
+    private Boolean hasResults;
+
     @OneToMany(mappedBy = "event", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<Tournament> tournaments = new HashSet<>();
 
