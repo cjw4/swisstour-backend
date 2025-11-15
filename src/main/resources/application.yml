@@ -17,6 +17,10 @@ spring:
             non_contextual_creation: true
         id:
           new_generator_mappings: true
+  security:
+    user:
+      name: swisstour-admin
+      password: sw1SSt0ur
 error:
   handling:
     http-status-in-json-response: true
@@ -30,3 +34,5 @@ error:
 server:
   error:
     include-message: always
+
+
