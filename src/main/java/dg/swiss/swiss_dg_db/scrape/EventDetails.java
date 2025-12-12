@@ -34,6 +34,7 @@ public class EventDetails {
     private Double points;
     private Double purse;
     private List<TournamentDetail> tournaments;
+    private boolean hasResults;
 
     public void scrapeEventInfo(Long eventId) throws IOException {
         String url = baseUrl + eventId;

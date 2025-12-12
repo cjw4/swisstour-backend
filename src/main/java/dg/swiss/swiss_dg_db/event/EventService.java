@@ -16,6 +16,7 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Sort;
@@ -71,11 +72,14 @@ public class EventService {
         eventDTO.setPurse(eventDetails.getPurse());
         eventDTO.setCity(eventDetails.getCity());
         eventDTO.setCountry(eventDetails.getCountry());
+        eventDTO.setHasResults(eventDetails.isHasResults());
         return eventDTO;
     }
 
     public EventDetails addTournaments(final Long id) throws IOException {
+        // go and get the event info again (in case anything has been updated on the pdga website)
         eventDetails.scrapeEventInfo(id);
+        // scrape the tournaments from the event results on pdga website
         eventDetails.scrapeEventResults(id, eventRepository.findById(id).get().getPoints());
         return eventDetails;
     }
@@ -153,7 +157,7 @@ public class EventService {
 
     public void toggleHasResults(final Long id) {
         eventRepository.findById(id).ifPresent(e -> {
-            e.setHasResults(true);
+            e.setHasResults(!e.getHasResults());
             eventRepository.save(e);
         });
     }
@@ -178,6 +182,14 @@ public class EventService {
                 .orElseThrow(NotFoundException::new);
         eventRepository.delete(event);
         publisher.publishEvent(new BeforeDeleteEvent(id));
+    }
+
+    @Transactional
+    public void deleteTournaments(final Long eventId) {
+        Event event = eventRepository.findById(eventId)
+                .orElseThrow(() -> new EntityNotFoundException("Event not found:" + eventId));
+        event.getTournaments().clear();
+        eventRepository.save(event);
     }
 
     private EventDTO mapToDTO(final Event event, final EventDTO eventDTO) {
@@ -212,7 +224,7 @@ public class EventService {
         event.setPurse(eventDTO.getPurse());
         event.setIsChampionship(eventDTO.getIsChampionship());
         event.setIsSwisstour(eventDTO.getIsSwisstour());
-        event.setHasResults(false);
+        event.setHasResults(eventDTO.getHasResults());
         return event;
     }
 }
