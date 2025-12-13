@@ -1,8 +1,5 @@
 package dg.swiss.swiss_dg_db.standings;
 
-import dg.swiss.swiss_dg_db.event.EventRepository;
-import dg.swiss.swiss_dg_db.player.Player;
-import dg.swiss.swiss_dg_db.player.PlayerRepository;
 import dg.swiss.swiss_dg_db.tournament.TournamentPointsDTO;
 import dg.swiss.swiss_dg_db.tournament.TournamentRepository;
 import org.springframework.stereotype.Service;
@@ -13,14 +10,9 @@ import java.util.stream.Collectors;
 @Service
 public class StandingService {
     private final TournamentRepository tournamentRepository;
-    private final PlayerRepository playerRepository;
-    private final EventRepository eventRepository;
 
-    public StandingService(TournamentRepository tournamentRepository,
-                           PlayerRepository playerRepository, EventRepository eventRepository) {
+    public StandingService(TournamentRepository tournamentRepository) {
         this.tournamentRepository = tournamentRepository;
-        this.playerRepository = playerRepository;
-        this.eventRepository = eventRepository;
     }
 
     public List<StandingDTO> getStandings(String division) {
@@ -36,9 +28,23 @@ public class StandingService {
                 .map(entry -> {
                     Long playerId = entry.getKey();
                     List<EventPointsDTO> eventPointsDTOs = entry.getValue().stream()
-                            .map(event -> new EventPointsDTO(event.getEventId(), event.getPoints()))
+                            .map(event ->
+                                    new EventPointsDTO(event.getEventId(), event.getPoints(), false))
+                            .collect(Collectors.toList());
+
+                    // Sort events by points in descending order
+                    List<EventPointsDTO> sortedEventPointsDTOs = eventPointsDTOs.stream()
+                            .sorted(Comparator.comparing(EventPointsDTO::getPoints).reversed())
                             .toList();
+
+                    // Mark top 7 events as final
+                    for (int i = 0; i < Math.min(7, sortedEventPointsDTOs.size()); i++) {
+                        sortedEventPointsDTOs.get(i).setIncluded(true);
+                    }
+
+                    // Calculate the total points
                     Double totalPoints = eventPointsDTOs.stream()
+                            .filter(EventPointsDTO::isIncluded)
                             .mapToDouble(EventPointsDTO::getPoints)
                             .sum();
                     return new StandingDTO(playerId, eventPointsDTOs, totalPoints, 0);
