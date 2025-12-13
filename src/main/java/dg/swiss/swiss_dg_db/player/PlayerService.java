@@ -70,6 +70,11 @@ public class PlayerService {
     public void delete(final Long id) {
         final Player player = playerRepository.findById(id)
                 .orElseThrow(NotFoundException::new);
+
+        // Explicitly clear relationships
+        player.getTournaments().clear();
+        playerRepository.save(player);
+
         publisher.publishEvent(new BeforeDeletePlayer(id));
         playerRepository.delete(player);
     }
