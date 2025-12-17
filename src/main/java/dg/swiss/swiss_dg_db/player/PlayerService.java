@@ -1,5 +1,7 @@
 package dg.swiss.swiss_dg_db.player;
 
+import dg.swiss.swiss_dg_db.event.EventRepository;
+import dg.swiss.swiss_dg_db.event.PlayerEventsDTO;
 import dg.swiss.swiss_dg_db.events.BeforeDeletePlayer;
 import dg.swiss.swiss_dg_db.scrape.NameConverter;
 import dg.swiss.swiss_dg_db.scrape.PlayerDetails;
@@ -20,12 +22,15 @@ public class PlayerService {
     private final PlayerRepository playerRepository;
     private final ApplicationEventPublisher publisher;
     private final PlayerDetails playerDetails;
+    private final EventRepository eventRepository;
 
     public PlayerService(final PlayerRepository playerRepository,
-            final ApplicationEventPublisher publisher) {
+                         final ApplicationEventPublisher publisher,
+                         final EventRepository eventRepository) {
         this.playerRepository = playerRepository;
         this.publisher = publisher;
         this.playerDetails = new PlayerDetails();
+        this.eventRepository = eventRepository;
     }
 
     public List<PlayerDTO> findAll() {
@@ -132,5 +137,9 @@ public class PlayerService {
         Player player = playerRepository.findByFirstnameAndLastname(nameInfo.getFirstName(), nameInfo.getLastName())
                 .orElseThrow(() -> new NotFoundException("Player not found"));
         return mapToDTO(player, new PlayerDTO());
+    }
+
+    public List<PlayerEventsDTO> getPlayerEvents(final Long id) {
+        return eventRepository.findEventsFromPlayer(id);
     }
 }

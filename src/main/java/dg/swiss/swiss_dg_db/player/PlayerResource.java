@@ -1,6 +1,7 @@
 package dg.swiss.swiss_dg_db.player;
 
 import dg.swiss.swiss_dg_db.event.EventDTO;
+import dg.swiss.swiss_dg_db.event.PlayerEventsDTO;
 import jakarta.validation.Valid;
 
 import java.io.IOException;
@@ -50,6 +51,11 @@ public class PlayerResource {
     public ResponseEntity<Void> deletePlayer(@PathVariable(name = "id") final Long id) {
         playerService.delete(id);
         return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/events/{id}")
+    public ResponseEntity<List<PlayerEventsDTO>> getPlayerEvents(@PathVariable(name = "id") final Long id) {
+        return ResponseEntity.ok(playerService.getPlayerEvents(id));
     }
 
 }
