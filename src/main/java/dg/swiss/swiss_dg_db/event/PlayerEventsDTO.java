@@ -25,6 +25,13 @@ public class PlayerEventsDTO {
     private Boolean isChampionship;
     private Boolean isSwisstour;
     private Boolean hasResults;
+    private String division;
     private Integer tournamentPlace;
+    private Integer tournamentRating;
+    private Double tournamentPrize;
+    private Integer tournamentScore;
+    private Double tournamentPoints;
+    private Integer roundNumber;
     private Integer roundRating;
+    private Integer roundScore;
 }

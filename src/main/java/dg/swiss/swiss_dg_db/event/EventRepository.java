@@ -13,7 +13,8 @@ public interface EventRepository extends JpaRepository<Event, Long> {
 
     @Query("SELECT new dg.swiss.swiss_dg_db.event.PlayerEventsDTO(" +
             "  e.id, e.name, e.displayName, e.tier, e.date, e.year, e.numberDays, e.city, e.country, e.numberPlayers, e.points, e.purse, e.isChampionship, e.isSwisstour, e.hasResults," +
-            "  t.place, r.rating" +
+            "  t.division, t.place, t.rating, t.prize, t.score, t.points," +
+            "  r.rating, r.rating, r.score" +
             ") " +
             "FROM Event e JOIN e.tournaments t JOIN t.rounds r JOIN t.player p " +
             "WHERE p.id = :id")
