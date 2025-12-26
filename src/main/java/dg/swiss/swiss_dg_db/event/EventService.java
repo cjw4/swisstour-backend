@@ -108,11 +108,17 @@ public class EventService {
             }
 
             playerDTO.setPdgaNumber(pdgaNumber);
-            playerDTO.setSwisstourLicense(false);
             playerService.addDetails(playerDTO);
             Thread.sleep(2000);
-            System.out.println("Adding Player: " + playerDTO.getFirstname() + " " + playerDTO.getLastname());
-            playerService.create(playerDTO);
+            if (playerService.nameExists(name)) {
+                System.out.println("Updating Player: " + playerDTO.getFirstname() + " " + playerDTO.getLastname());
+                playerService.update(playerDTO.getId(), playerDTO);
+            } else {
+                playerDTO.setSwisstourLicense(false);
+                System.out.println("Adding Player: " + playerDTO.getFirstname() + " " + playerDTO.getLastname());
+                playerService.create(playerDTO);
+            }
+
         // Search by Name
         } else if (pdgaNumber == null && !playerService.nameExists(name)) {
             playerDTO = new PlayerDTO();
