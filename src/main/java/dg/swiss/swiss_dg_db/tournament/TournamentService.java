@@ -10,6 +10,8 @@ import dg.swiss.swiss_dg_db.player.PlayerRepository;
 import dg.swiss.swiss_dg_db.util.NotFoundException;
 import dg.swiss.swiss_dg_db.util.ReferencedException;
 import java.util.List;
+import java.util.Optional;
+
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.event.EventListener;
 import org.springframework.data.domain.Sort;
@@ -49,8 +51,14 @@ public class TournamentService {
     public Long create(final TournamentDTO tournamentDTO) {
         final Tournament tournament = new Tournament();
         mapToEntity(tournamentDTO, tournament);
+        // save the tournament if it one does not already exist for that player
         if (!tournamentRepository.existsByPlayerIdAndEventId(tournamentDTO.getPlayer(), tournamentDTO.getEvent())) {
-            System.out.println("Adding Tournament Results: " + tournamentDTO.getPlayer() + " " + tournamentDTO.getEvent());
+            this.playerRepository.findById(tournamentDTO.getPlayer())
+                    .ifPresentOrElse(player -> {
+                        System.out.println("Adding tournament to database for: " + player.getFirstname() + " " + player.getLastname());
+                    }, () -> {
+                        System.out.println("Player was not found in the database, no tournament created.");
+                    });
             return tournamentRepository.save(tournament).getId();
         } else {
             return tournamentRepository.findByPlayerIdAndEventId(tournamentDTO.getPlayer(), tournamentDTO.getEvent()).getId();

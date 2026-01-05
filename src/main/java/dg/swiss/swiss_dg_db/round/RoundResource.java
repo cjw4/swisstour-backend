@@ -18,7 +18,7 @@ public class RoundResource {
     public void createRound(final RoundDTO roundDTO) {
         final Round round = new Round();
         mapToEntity(roundDTO, round);
-        System.out.println("Adding Round...");
+        System.out.println("Adding round " + round.getRoundNumber() + " to database");
         roundRepository.save(round);
     }
 

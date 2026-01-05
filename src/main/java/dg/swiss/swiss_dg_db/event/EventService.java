@@ -126,11 +126,15 @@ public class EventService {
             playerService.addDetails(playerDTO);
             Thread.sleep(2000);
             if (playerService.nameExists(name)) {
-                System.out.println("Updating Player: " + playerDTO.getFirstname() + " " + playerDTO.getLastname());
+                System.out.println("Updating player, now PDGA registered, in database: "
+                        + playerDTO.getFirstname() + " "
+                        + playerDTO.getLastname());
                 playerService.update(playerDTO.getId(), playerDTO);
             } else {
                 playerDTO.setSwisstourLicense(false);
-                System.out.println("Adding Player: " + playerDTO.getFirstname() + " " + playerDTO.getLastname());
+                System.out.println("Adding registered PDGA player to database: " +
+                        playerDTO.getFirstname() + " "
+                        + playerDTO.getLastname());
                 playerService.create(playerDTO);
             }
 
@@ -143,7 +147,9 @@ public class EventService {
             playerDTO.setLastname(nameInfo.getLastName());
             playerDTO.setIsPro(false);
             playerDTO.setSwisstourLicense(false);
-            System.out.println("Adding Player: " + playerDTO.getFirstname() + " " + playerDTO.getLastname());
+            System.out.println("Adding non-registered PDGA player to database: "
+                    + playerDTO.getFirstname() + " "
+                    + playerDTO.getLastname());
             playerService.create(playerDTO);
         }
     }
