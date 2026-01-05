@@ -312,7 +312,7 @@ public class EventDetails {
                 prize = null;
             }
             // Scrape rounds
-            Elements roundScores = tournament.select("td.round > a.score");
+            Elements roundScores = tournament.select("td.round, td.round > a.score");
             Elements roundRatings = tournament.select("td.round-rating");
 
             List<RoundDetail> rounds = new ArrayList<>();
