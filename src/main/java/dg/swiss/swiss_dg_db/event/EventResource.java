@@ -68,16 +68,18 @@ public class EventResource {
         EventDetails eventDetails = eventService.addTournaments(id);
 
         // for each of the tournaments in the event
-        eventDetails.getTournaments().forEach(tournamentDetail -> {
+        for (EventDetails.TournamentDetail tournamentDetail : eventDetails.getTournaments()) {
             try {
-                // add the player to the database (if necessary)
                 eventService.addPlayerFromEvent(tournamentDetail);
-            } catch (IOException | InterruptedException e) {
+                eventService.addTournamentFromEvent(id, tournamentDetail);
+            } catch (InterruptedException e) {
                 throw new TooManyRequestsException();
+            } catch (IOException e) {
+                // System.err.println("Skipping tournament due to error fetching player details: " + e.getMessage());
+                continue;
             }
-            // add the tournament from the event
-            eventService.addTournamentFromEvent(id, tournamentDetail);
-        });
+        }
+
         eventService.toggleHasResults(id);
         return new ResponseEntity<>(id, HttpStatus.OK);
     }

@@ -24,11 +24,16 @@ public class PlayerDetails {
     public void scrapePlayerInfo(long pdgaNumber) throws IOException {
         this.pdgaNumber = pdgaNumber;
         // get the DOM of the player
-        Document document = Jsoup.connect(baseUrl + pdgaNumber).get();
-        // call function to scrape names and assign
-        this.firstname = scrapeName(document).getFirstName();
-        this.lastname = scrapeName(document).getLastName();
-        this.isPro = scrapePro(document);
+        try {
+            Document document = Jsoup.connect(baseUrl + pdgaNumber).get();
+            // call function to scrape names and assign
+            this.firstname = scrapeName(document).getFirstName();
+            this.lastname = scrapeName(document).getLastName();
+            this.isPro = scrapePro(document);
+        } catch (IOException e) {
+            System.err.println("Skipping tournament: " + e.getMessage());
+            throw e;
+        }
     }
 
     private NameConverter.NameInfo scrapeName(Document document) {
