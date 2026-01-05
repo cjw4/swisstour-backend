@@ -36,8 +36,12 @@ public class EventResource {
     }
 
     @GetMapping("/year/{year}")
-    public ResponseEntity<List<EventDTO>> getEventsByYear(@PathVariable Integer year) {
-        return ResponseEntity.ok(eventService.findByYear(year));
+    public ResponseEntity<List<EventDTO>> getEventsByYear(@PathVariable Integer year, @RequestParam(required = false) String division) {
+        if (division != null) {
+            return ResponseEntity.ok(eventService.findByYearAndDivision(year, division));
+        } else {
+            return ResponseEntity.ok(eventService.findByYear(year));
+        }
     }
 
     @GetMapping("/{id}")

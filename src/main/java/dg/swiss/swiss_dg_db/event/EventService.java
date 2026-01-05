@@ -56,10 +56,25 @@ public class EventService {
                 .toList();
     }
 
+
     public List<EventDTO> findByYear(Integer year) {
         final List<Event> events = eventRepository.findAll(Sort.by("id"));
         return events.stream()
                 .filter(event -> event.getYear().equals(year))
+                .map(event -> mapToDTO(event, new EventDTO()))
+                .toList();
+    }
+
+    @Transactional
+    public List<EventDTO> findByYearAndDivision(Integer year, String division) {
+        final List<Event> events = eventRepository.findAll(Sort.by("id"));
+        return events
+                .stream()
+                .filter(event -> event.getYear().equals(year))
+                .filter(event -> {
+                    var tournaments = event.getTournaments();
+                    return tournaments.stream().anyMatch(t -> t.getDivision().equals(division));
+                })
                 .map(event -> mapToDTO(event, new EventDTO()))
                 .toList();
     }
