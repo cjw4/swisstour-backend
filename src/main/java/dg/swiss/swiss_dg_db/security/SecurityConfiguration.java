@@ -44,7 +44,6 @@ public class SecurityConfiguration {
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(authorize -> {
                     authorize.requestMatchers("/login").permitAll();
-                    authorize.requestMatchers(HttpMethod.POST, "/api/events/year/{year}").authenticated();
                     authorize.requestMatchers(HttpMethod.PUT, "/api/events/{id}").authenticated();
                     authorize.requestMatchers(HttpMethod.POST, "/api/events/results/{id}").authenticated();
                     authorize.requestMatchers(HttpMethod.DELETE, "/api/events/{id}").authenticated();

@@ -4,7 +4,6 @@ import dg.swiss.swiss_dg_db.exceptions.EventAlreadyExistsException;
 import dg.swiss.swiss_dg_db.exceptions.TooManyRequestsException;
 import dg.swiss.swiss_dg_db.player.PlayerService;
 import dg.swiss.swiss_dg_db.scrape.EventDetails;
-import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.Valid;
 
 import java.io.IOException;
@@ -31,17 +30,20 @@ public class EventResource {
     }
 
     @GetMapping
-    public ResponseEntity<List<EventDTO>> getAllEvents() {
-        return ResponseEntity.ok(eventService.findAll());
-    }
-
-    @GetMapping("/year/{year}")
-    public ResponseEntity<List<EventDTO>> getEventsByYear(@PathVariable Integer year, @RequestParam(required = false) String division) {
-        if (division != null) {
-            return ResponseEntity.ok(eventService.findByYearAndDivision(year, division));
-        } else {
+    public ResponseEntity<List<EventDTO>> getEvents(
+            @RequestParam(required = false) Integer year,
+            @RequestParam(required = false) String division)
+    {
+        if (year == null && division == null) {
+            return ResponseEntity.ok(eventService.findAll());
+        }
+        if (year != null && division == null) {
             return ResponseEntity.ok(eventService.findByYear(year));
         }
+        if (year == null) {
+            return ResponseEntity.noContent().build();
+        }
+        return ResponseEntity.ok(eventService.findByYearAndDivision(year, division));
     }
 
     @GetMapping("/{id}")
@@ -113,6 +115,16 @@ public class EventResource {
     public ResponseEntity<Void> deleteEvent(@PathVariable(name = "id") final Long id) {
         eventService.delete(id);
         return ResponseEntity.noContent().build();
+    }
+
+    // This endpoint is now redundant with the new implementation of getEvents, it can be deleted when the frontend endpoints have been updated
+    @GetMapping("/year/{year}")
+    public ResponseEntity<List<EventDTO>> getEventsByYear(@PathVariable Integer year, @RequestParam(required = false) String division) {
+        if (division != null) {
+            return ResponseEntity.ok(eventService.findByYearAndDivision(year, division));
+        } else {
+            return ResponseEntity.ok(eventService.findByYear(year));
+        }
     }
 
 }
