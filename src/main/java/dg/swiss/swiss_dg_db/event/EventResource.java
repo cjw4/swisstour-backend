@@ -4,6 +4,8 @@ import dg.swiss.swiss_dg_db.exceptions.EventAlreadyExistsException;
 import dg.swiss.swiss_dg_db.exceptions.TooManyRequestsException;
 import dg.swiss.swiss_dg_db.player.PlayerService;
 import dg.swiss.swiss_dg_db.scrape.EventDetails;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 
 import java.io.IOException;
@@ -17,6 +19,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping(value = "/api/events", produces = MediaType.APPLICATION_JSON_VALUE)
+@Tag(name = "Events")
 public class EventResource {
 
     private final EventService eventService;
@@ -30,6 +33,7 @@ public class EventResource {
     }
 
     @GetMapping
+    @SecurityRequirement(name = "bearerAuth")
     public ResponseEntity<List<EventDTO>> getEvents(
             @RequestParam(required = false) Integer year,
             @RequestParam(required = false) String division)
@@ -52,6 +56,7 @@ public class EventResource {
     }
 
     @PostMapping
+    @SecurityRequirement(name = "bearerAuth")
     public ResponseEntity<EventDTO> createEvent(@RequestBody @Valid final EventDTO eventDTO) throws IOException {
         if (eventDTO.getEventId() != null && eventRepository.existsByEventId(eventDTO.getEventId())) {
             throw new EventAlreadyExistsException();

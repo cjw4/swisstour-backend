@@ -43,7 +43,12 @@ public class SecurityConfiguration {
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(authorize -> {
-                    authorize.requestMatchers("/login").permitAll();
+                    authorize.requestMatchers(
+                            "/login",
+                            "/v3/api-docs",
+                            "/v3/api-docs/**",
+                            "swagger-ui.html"
+                    ).permitAll();
                     authorize.requestMatchers(HttpMethod.PUT, "/api/events/{id}").authenticated();
                     authorize.requestMatchers(HttpMethod.POST, "/api/events/results/{id}").authenticated();
                     authorize.requestMatchers(HttpMethod.DELETE, "/api/events/{id}").authenticated();

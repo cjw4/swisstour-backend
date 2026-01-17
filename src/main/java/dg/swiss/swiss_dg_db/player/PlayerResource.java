@@ -2,6 +2,9 @@ package dg.swiss.swiss_dg_db.player;
 
 import dg.swiss.swiss_dg_db.event.EventDTO;
 import dg.swiss.swiss_dg_db.event.PlayerEventsDTO;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 
 import java.io.IOException;
@@ -13,6 +16,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping(value = "/api/players", produces = MediaType.APPLICATION_JSON_VALUE)
+@Tag(name = "Players")
 public class PlayerResource {
 
     private final PlayerService playerService;
@@ -22,10 +26,14 @@ public class PlayerResource {
     }
 
     @GetMapping
+    @SecurityRequirement(name = "bearerAuth")
     public ResponseEntity<List<PlayerDTO>> getAllPlayers() {
         return ResponseEntity.ok(playerService.findAll());
     }
 
+    @Operation(
+            description = "Get player by id"
+    )
     @GetMapping("/{id}")
     public ResponseEntity<PlayerDTO> getPlayer(@PathVariable(name = "id") final Long id) {
         return ResponseEntity.ok(playerService.get(id));
