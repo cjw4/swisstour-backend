@@ -53,12 +53,13 @@ public class EventResource {
 
     @PostMapping
     public ResponseEntity<EventDTO> createEvent(@RequestBody @Valid final EventDTO eventDTO) throws IOException {
-        if (!eventRepository.existsEventById(eventDTO.getId())) {
-            EventDTO eventDTOwDetails = eventService.addDetails(eventDTO);
-            eventService.create(eventDTOwDetails);
-            return new ResponseEntity<>(eventDTOwDetails, HttpStatus.CREATED);
+        if (eventDTO.getEventId() != null && eventRepository.existsByEventId(eventDTO.getEventId())) {
+            throw new EventAlreadyExistsException();
         }
-        throw new EventAlreadyExistsException();
+        EventDTO eventDTOwDetails = eventService.addDetails(eventDTO);
+        eventService.create(eventDTOwDetails);
+        return new ResponseEntity<>(eventDTOwDetails, HttpStatus.CREATED);
+
     }
 
     @PostMapping("/results/{id}")

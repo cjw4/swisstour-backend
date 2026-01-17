@@ -13,12 +13,11 @@ import java.util.List;
 @Setter
 public class PlayerEventsDTO {
     private Long id;
+    private Long eventId;
     private String name;
     private String displayName;
     private String tier;
-    private LocalDate date;
     private Integer year;
-    private Integer numberDays;
     private String city;
     private String country;
     private Integer numberPlayers;
@@ -27,6 +26,12 @@ public class PlayerEventsDTO {
     private Boolean isChampionship;
     private Boolean isSwisstour;
     private Boolean hasResults;
+    private String infoLink;
+    private String registrationLink;
+    private LocalDate registrationStart;
+    private String swisstourType;
+    private LocalDate startDate;
+    private LocalDate endDate;
     private String division;
     private Integer tournamentPlace;
     private Integer tournamentRating;

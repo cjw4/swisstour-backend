@@ -16,6 +16,8 @@ public class EventDTO {
 
     private Long id;
 
+    private Long eventId;
+
     @Size(max = 255)
     private String name;
 
@@ -25,11 +27,7 @@ public class EventDTO {
     @Size(max = 255)
     private String tier;
 
-    private LocalDate date;
-
     private Integer year;
-
-    private Integer numberDays;
 
     @Size(max = 255)
     private String city;
@@ -54,5 +52,20 @@ public class EventDTO {
 
     @JsonProperty("hasResults")
     private Boolean hasResults;
+
+    @Size(max = 500)
+    private String infoLink;
+
+    @Size(max = 500)
+    private String registrationLink;
+
+    private LocalDate registrationStart;
+
+    @Size(max = 50)
+    private String swisstourType;
+
+    private LocalDate startDate;
+
+    private LocalDate endDate;
 
 }

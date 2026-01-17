@@ -19,7 +19,7 @@ public interface TournamentRepository extends JpaRepository<Tournament, Long> {
     Tournament findByPlayerIdAndEventId(Long playerId, Long eventId);
 
     @Query("SELECT new dg.swiss.swiss_dg_db.tournament.TournamentPointsDTO(" +
-            "t.division, p.id, e.id, p.swisstourLicense, e.isSwisstour, t.points, e.year) " +
+            "t.division, p.id, e.eventId, p.swisstourLicense, e.isSwisstour, t.points, e.year) " +
             "FROM Tournament t " +
             "JOIN t.player p " +
             "JOIN t.event e " +

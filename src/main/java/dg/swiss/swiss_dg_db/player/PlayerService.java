@@ -150,45 +150,51 @@ public class PlayerService {
         Map<Long, PlayerEventsDTO> eventMap = new HashMap<>();
 
         for (Object[] raw : rawEvents) {
-            Long eventId = (Long) raw[0];
-            String name = (String) raw[1];
-            String displayName = (String) raw[2];
-            String tier = (String) raw[3];
-            LocalDate date = (LocalDate) raw[4];
+            Long pk = (Long) raw[0];
+            Long eventId = (Long) raw[1];
+            String name = (String) raw[2];
+            String displayName = (String) raw[3];
+            String tier = (String) raw[4];
             int year = (int) raw[5];
-            int numberDays = (int) raw[6];
-            String city = (String) raw[7];
-            String country = (String) raw[8];
-            int numberPlayers = (int) raw[9];
-            int points = (int) raw[10];
-            double purse = (double) raw[11];
-            boolean isChampionship = (boolean) raw[12];
-            boolean isSwisstour = (boolean) raw[13];
-            boolean hasResults = (boolean) raw[14];
-            String division = (String) raw[15];
-            int tournamentPlace = (int) raw[16];
-            Integer tournamentRating = raw[17] != null ? (Integer) raw[17] : null; // Nullable
-            double tournamentPrize = raw[18] != null ? (double) raw[18] : 0;
-            int tournamentScore = raw[19] != null ? (int) raw[19] : 0;
-            double tournamentPoints = (double) raw[20];
+            String city = (String) raw[6];
+            String country = (String) raw[7];
+            int numberPlayers = (int) raw[8];
+            int points = (int) raw[9];
+            double purse = raw[10] != null ? (double) raw[10] : 0;
+            boolean isChampionship = (boolean) raw[11];
+            boolean isSwisstour = (boolean) raw[12];
+            boolean hasResults = (boolean) raw[13];
+            String infoLink = (String) raw[14];
+            String registrationLink = (String) raw[15];
+            LocalDate registrationStart = (LocalDate) raw[16];
+            String swisstourType = (String) raw[17];
+            LocalDate startDate = (LocalDate) raw[18];
+            LocalDate endDate = (LocalDate) raw[19];
+            String division = (String) raw[20];
+            int tournamentPlace = (int) raw[21];
+            Integer tournamentRating = raw[22] != null ? (Integer) raw[22] : null;
+            double tournamentPrize = raw[23] != null ? (double) raw[23] : 0;
+            int tournamentScore = raw[24] != null ? (int) raw[24] : 0;
+            double tournamentPoints = (double) raw[25];
 
-            if (!eventMap.containsKey(eventId)) {
+            if (!eventMap.containsKey(pk)) {
                 List<RoundDTOsmall> rounds = new ArrayList<>();
                 // Create new PlayerEventsDTO with common fields
-                PlayerEventsDTO eventDTO = new PlayerEventsDTO(eventId, name, displayName, tier, date, year,
-                        numberDays, city, country, numberPlayers, points, purse,
-                        isChampionship, isSwisstour, hasResults, division,
+                PlayerEventsDTO eventDTO = new PlayerEventsDTO(pk, eventId, name, displayName, tier, year,
+                        city, country, numberPlayers, points, purse,
+                        isChampionship, isSwisstour, hasResults, infoLink, registrationLink,
+                        registrationStart, swisstourType, startDate, endDate, division,
                         tournamentPlace, tournamentRating, tournamentPrize,
                         tournamentScore, tournamentPoints, rounds);
-                eventMap.put(eventId, eventDTO);
+                eventMap.put(pk, eventDTO);
             }
 
             // Extract round information
-            int roundNumber = raw[21] != null ? (int) raw[21] : 0;
-            int roundRating = raw[22] != null ? (int) raw[22] : 0;
-            int roundScore = raw[23] != null ? (int) raw[23] : 0;
+            int roundNumber = raw[26] != null ? (int) raw[26] : 0;
+            int roundRating = raw[27] != null ? (int) raw[27] : 0;
+            int roundScore = raw[28] != null ? (int) raw[28] : 0;
             RoundDTOsmall round = new RoundDTOsmall(roundNumber, roundRating, roundScore);
-            eventMap.get(eventId).getRounds().add(round);
+            eventMap.get(pk).getRounds().add(round);
         }
 
         return new ArrayList<>(eventMap.values());

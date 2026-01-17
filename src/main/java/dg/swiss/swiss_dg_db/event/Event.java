@@ -18,33 +18,33 @@ public class Event {
 
     @Id
     @Column(nullable = false, updatable = false)
+    @GeneratedValue(
+            strategy = GenerationType.SEQUENCE
+    )
     private Long id;
 
-    @Column(nullable = false)
+    @Column(unique = true)
+    private Long eventId;
+
+    @Column
     private String name;
 
     @Column
     private String displayName;
 
-    @Column(nullable = false)
+    @Column
     private String tier;
 
     @Column(nullable = false)
-    private LocalDate date;
-
-    @Column(nullable = false, columnDefinition = "INTEGER DEFAULT 2025")
     private Integer year;
 
-    @Column(nullable = false)
-    private Integer numberDays;
-
-    @Column(nullable = false)
+    @Column
     private String city;
 
-    @Column(nullable = false)
+    @Column
     private String country;
 
-    @Column(nullable = false)
+    @Column
     private Integer numberPlayers;
 
     @Column(nullable = false)
@@ -59,8 +59,26 @@ public class Event {
     @Column(nullable = false)
     private Boolean isSwisstour;
 
-    @Column(nullable = false, columnDefinition = "boolean default false")
+    @Column(nullable = false, columnDefinition = "boolean default false not null")
     private Boolean hasResults;
+
+    @Column
+    private String infoLink;
+
+    @Column
+    private String registrationLink;
+
+    @Column
+    private LocalDate registrationStart;
+
+    @Column
+    private String swisstourType;
+
+    @Column
+    private LocalDate startDate;
+
+    @Column
+    private LocalDate endDate;
 
     @OneToMany(mappedBy = "event", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<Tournament> tournaments = new HashSet<>();

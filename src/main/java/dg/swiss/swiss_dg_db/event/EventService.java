@@ -50,7 +50,7 @@ public class EventService {
     }
 
     public List<EventDTO> findAll() {
-        final List<Event> events = eventRepository.findAll(Sort.by("id"));
+        final List<Event> events = eventRepository.findAll(Sort.by("startDate"));
         return events.stream()
                 .map(event -> mapToDTO(event, new EventDTO()))
                 .toList();
@@ -58,7 +58,7 @@ public class EventService {
 
 
     public List<EventDTO> findByYear(Integer year) {
-        final List<Event> events = eventRepository.findAll(Sort.by("id"));
+        final List<Event> events = eventRepository.findAll(Sort.by("startDate"));
         return events.stream()
                 .filter(event -> event.getYear().equals(year))
                 .map(event -> mapToDTO(event, new EventDTO()))
@@ -67,7 +67,7 @@ public class EventService {
 
     @Transactional
     public List<EventDTO> findByYearAndDivision(Integer year, String division) {
-        final List<Event> events = eventRepository.findAll(Sort.by("id"));
+        final List<Event> events = eventRepository.findAll(Sort.by("startDate"));
         return events
                 .stream()
                 .filter(event -> event.getYear().equals(year))
@@ -85,25 +85,41 @@ public class EventService {
                 .orElseThrow(NotFoundException::new);
     }
 
+    public EventDTO getByEventId(final Long eventId) {
+        return eventRepository.findByEventId(eventId)
+                .map(event -> mapToDTO(event, new EventDTO()))
+                .orElseThrow(NotFoundException::new);
+    }
+
     public EventDTO addDetails(EventDTO eventDTO) throws IOException {
-        eventDetails.scrapeEventInfo(eventDTO.getId());
-        eventDTO.setName(eventDetails.getName());
-        eventDTO.setDate(eventDetails.getDate());
-        eventDTO.setNumberDays(eventDetails.getNumberDays());
-        eventDTO.setTier(eventDetails.getTier());
-        eventDTO.setNumberPlayers(eventDetails.getNumberPlayers());
-        eventDTO.setPurse(eventDetails.getPurse());
-        eventDTO.setCity(eventDetails.getCity());
-        eventDTO.setCountry(eventDetails.getCountry());
-        eventDTO.setHasResults(eventDetails.isHasResults());
+        if (eventDTO.getEventId() != null) {
+            eventDetails.scrapeEventInfo(eventDTO.getEventId());
+            eventDTO.setName(eventDetails.getName());
+            eventDTO.setStartDate(eventDetails.getDate());
+            if (eventDetails.getNumberDays() > 0) {
+                eventDTO.setEndDate(eventDetails.getDate().plusDays(eventDetails.getNumberDays() - 1));
+            } else {
+                eventDTO.setEndDate(eventDetails.getDate());
+            }
+            eventDTO.setTier(eventDetails.getTier());
+            eventDTO.setNumberPlayers(eventDetails.getNumberPlayers());
+            eventDTO.setPurse(eventDetails.getPurse());
+            eventDTO.setCity(eventDetails.getCity());
+            eventDTO.setCountry(eventDetails.getCountry());
+            eventDTO.setHasResults(eventDetails.isHasResults());
+        }
         return eventDTO;
     }
 
     public EventDetails addTournaments(final Long id) throws IOException {
+        // get the event by PK to retrieve the eventId for scraping
+        Event event = eventRepository.findById(id)
+                .orElseThrow(NotFoundException::new);
+        Long eventId = event.getEventId();
         // go and get the event info again (in case anything has been updated on the pdga website)
-        eventDetails.scrapeEventInfo(id);
+        eventDetails.scrapeEventInfo(eventId);
         // scrape the tournaments from the event results on pdga website
-        eventDetails.scrapeEventResults(id, eventRepository.findById(id).get().getPoints());
+        eventDetails.scrapeEventResults(eventId, event.getPoints());
         return eventDetails;
     }
 
@@ -154,7 +170,7 @@ public class EventService {
         }
     }
 
-    public void addTournamentFromEvent(Long eventId,
+    public void addTournamentFromEvent(Long id,
                                        EventDetails.TournamentDetail tournamentDetail) {
         Long pdgaNumber = tournamentDetail.getPdgaNumber();
         String name = tournamentDetail.getName();
@@ -168,7 +184,7 @@ public class EventService {
         }
         // Create TournamentDTO
         TournamentDTO tournamentDTO = new TournamentDTO();
-        tournamentDTO.setEvent(eventId);
+        tournamentDTO.setEvent(id);
         tournamentDTO.setPlayer(playerId);
         tournamentDTO.setDivision(tournamentDetail.getDivision());
         tournamentDTO.setPlace(tournamentDetail.getPlace());
@@ -200,7 +216,9 @@ public class EventService {
     public EventDTO create(final EventDTO eventDTO) {
         final Event event = new Event();
         mapToEntity(eventDTO, event);
+        event.setHasResults(false);
         eventRepository.save(event);
+        eventDTO.setId(event.getId());
         return eventDTO;
     }
 
@@ -220,21 +238,20 @@ public class EventService {
     }
 
     @Transactional
-    public void deleteTournaments(final Long eventId) {
-        Event event = eventRepository.findById(eventId)
-                .orElseThrow(() -> new EntityNotFoundException("Event not found:" + eventId));
+    public void deleteTournaments(final Long id) {
+        Event event = eventRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Event not found:" + id));
         event.getTournaments().clear();
         eventRepository.save(event);
     }
 
     private EventDTO mapToDTO(final Event event, final EventDTO eventDTO) {
         eventDTO.setId(event.getId());
+        eventDTO.setEventId(event.getEventId());
         eventDTO.setName(event.getName());
         eventDTO.setDisplayName(event.getDisplayName());
         eventDTO.setTier(event.getTier());
-        eventDTO.setDate(event.getDate());
         eventDTO.setYear(event.getYear());
-        eventDTO.setNumberDays(event.getNumberDays());
         eventDTO.setCity(event.getCity());
         eventDTO.setCountry(event.getCountry());
         eventDTO.setNumberPlayers(event.getNumberPlayers());
@@ -243,17 +260,21 @@ public class EventService {
         eventDTO.setIsChampionship(event.getIsChampionship());
         eventDTO.setIsSwisstour(event.getIsSwisstour());
         eventDTO.setHasResults(event.getHasResults());
+        eventDTO.setInfoLink(event.getInfoLink());
+        eventDTO.setRegistrationLink(event.getRegistrationLink());
+        eventDTO.setRegistrationStart(event.getRegistrationStart());
+        eventDTO.setSwisstourType(event.getSwisstourType());
+        eventDTO.setStartDate(event.getStartDate());
+        eventDTO.setEndDate(event.getEndDate());
         return eventDTO;
     }
 
     private Event mapToEntity(final EventDTO eventDTO, final Event event) {
-        event.setId(eventDTO.getId());
+        event.setEventId(eventDTO.getEventId());
         event.setName(eventDTO.getName());
         event.setDisplayName(eventDTO.getDisplayName());
         event.setTier(eventDTO.getTier());
-        event.setDate(eventDTO.getDate());
         event.setYear(eventDTO.getYear());
-        event.setNumberDays(eventDTO.getNumberDays());
         event.setCity(eventDTO.getCity());
         event.setCountry(eventDTO.getCountry());
         event.setNumberPlayers(eventDTO.getNumberPlayers());
@@ -262,6 +283,12 @@ public class EventService {
         event.setIsChampionship(eventDTO.getIsChampionship());
         event.setIsSwisstour(eventDTO.getIsSwisstour());
         event.setHasResults(eventDTO.getHasResults());
+        event.setInfoLink(eventDTO.getInfoLink());
+        event.setRegistrationLink(eventDTO.getRegistrationLink());
+        event.setRegistrationStart(eventDTO.getRegistrationStart());
+        event.setSwisstourType(eventDTO.getSwisstourType());
+        event.setStartDate(eventDTO.getStartDate());
+        event.setEndDate(eventDTO.getEndDate());
         return event;
     }
 }
