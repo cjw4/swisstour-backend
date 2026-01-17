@@ -103,9 +103,6 @@ public class EventResource {
         EventDTO eventDTOwDetails = eventService.addDetails(eventDTO);
         eventService.update(id, eventDTOwDetails);
 
-        // make sure that the ids from event DTO from the request body is equal to that in the path
-        if (!eventDTOwDetails.getId().equals(id)) { return new ResponseEntity<>(HttpStatus.CONFLICT); }
-
         // remove all tournaments assigned to the event -> necessary to do if the points were changed
         if (!Objects.equals(ptsBefore, ptsAfter)) {
             eventService.deleteTournaments(id);
