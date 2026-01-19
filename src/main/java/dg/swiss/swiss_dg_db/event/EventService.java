@@ -107,6 +107,8 @@ public class EventService {
             eventDTO.setCity(eventDetails.getCity());
             eventDTO.setCountry(eventDetails.getCountry());
             eventDTO.setHasResults(eventDetails.isHasResults());
+        } else {
+            eventDTO.setHasResults(false);
         }
         return eventDTO;
     }
