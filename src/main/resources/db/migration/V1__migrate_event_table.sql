@@ -2,8 +2,6 @@
 -- From: change-events-table (afaf47b)
 -- To: main branch schema
 
-BEGIN;
-
 -- =============================================
 -- 1. ADD NEW COLUMNS
 -- =============================================
@@ -66,5 +64,3 @@ CREATE SEQUENCE IF NOT EXISTS event_seq START WITH 1 INCREMENT BY 50;
 
 -- Set sequence to continue from next allocation block after max existing id
 SELECT setval('event_seq', COALESCE((SELECT ((MAX(id) / 50) + 1) * 50 FROM "events"), 1), false);
-
-COMMIT;
