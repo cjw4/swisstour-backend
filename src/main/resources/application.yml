@@ -29,6 +29,8 @@ spring:
     user:
       name: swisstour-admin
       password: sw1SSt0ur
+  flyway:
+    baseline-on-migrate: true
 error:
   handling:
     http-status-in-json-response: true
@@ -59,6 +61,7 @@ spring:
       ddl-auto: validate
   flyway:
     enabled: true
+    baseline-on-migrate: true
 app:
   frontend:
     url: "https://swisstour.onrender.com"
