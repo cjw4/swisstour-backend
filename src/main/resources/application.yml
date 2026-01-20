@@ -54,6 +54,11 @@ spring:
     url: ${JDBC_DATABASE_URL:jdbc:postgresql://dpg-d51cdomuk2gs73c6agk0-a.frankfurt-postgres.render.com:5432/swiss_dg_db}
     username: ${JDBC_DATABASE_USERNAME:${DB_USERNAME}}
     password: ${JDBC_DATABASE_PASSWORD:${DB_PASSWORD}}
+  jpa:
+    hibernate:
+      ddl-auto: validate
+  flyway:
+    enabled: true
 app:
   frontend:
     url: "https://swisstour.onrender.com"
