@@ -101,6 +101,7 @@ public class EventResource {
 
         // add the details to the eventDTO from what was previously in the database
         EventDTO eventDTOwDetails = eventService.addDetails(eventDTO);
+        eventDTOwDetails.setId(id);
         eventService.update(id, eventDTOwDetails);
 
         // remove all tournaments assigned to the event -> necessary to do if the points were changed
