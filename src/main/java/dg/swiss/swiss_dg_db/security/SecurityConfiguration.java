@@ -25,7 +25,10 @@ import java.util.List;
 public class SecurityConfiguration {
 
     @Value("${app.frontend.url}")
-    private String frontendUrl;
+    private String frontendUrlRender;
+
+    @Value("${app.frontend.urlDiscgolf}")
+    private String frontendUrlDiscgolf;
 
     @Bean
     public AuthenticationManager authenticationManager(HttpSecurity http) throws Exception {
@@ -47,7 +50,7 @@ public class SecurityConfiguration {
                             "/login",
                             "/v3/api-docs",
                             "/v3/api-docs/**",
-                            "swagger-ui.html"
+                            "/swagger-ui.html"
                     ).permitAll();
                     authorize.requestMatchers(HttpMethod.PUT, "/api/events/{id}").authenticated();
                     authorize.requestMatchers(HttpMethod.POST, "/api/events/results/{id}").authenticated();
@@ -72,7 +75,7 @@ public class SecurityConfiguration {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(List.of(frontendUrl));
+        configuration.setAllowedOrigins(List.of(frontendUrlRender, frontendUrlDiscgolf));
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(Arrays.asList("*"));
         configuration.setAllowCredentials(true);

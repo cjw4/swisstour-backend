@@ -26,10 +26,6 @@ spring:
     hikari:
       connection-timeout: 30000
       maximum-pool-size: 10
-  security:
-    user:
-      name: swisstour-admin
-      password: sw1SSt0ur
   flyway:
     baseline-on-migrate: true
 error:
@@ -48,6 +44,7 @@ server:
 app:
   frontend:
     url: "http://localhost:4200"
+    urlDiscgolf: ""
 ---
 spring:
   config:
@@ -66,5 +63,6 @@ spring:
 app:
   frontend:
     url: "https://swisstour.onrender.com"
+    urlDiscgolf: "https://swisstour.discgolf.ch"
 
 
