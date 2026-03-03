@@ -7,7 +7,10 @@ import jakarta.persistence.*;
 
 import java.util.HashSet;
 import java.util.Set;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 
@@ -15,6 +18,9 @@ import lombok.Setter;
 @Table(name = "Tournaments")
 @Getter
 @Setter
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
 public class Tournament {
 
     @Id
@@ -47,6 +53,7 @@ public class Tournament {
     @JoinColumn(name = "event_id", nullable = false)
     private Event event;
 
+    @Builder.Default
     @OneToMany(mappedBy = "tournament", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<Round> rounds = new HashSet<>();
 

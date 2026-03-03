@@ -84,6 +84,7 @@ public class Event {
     @Column
     private LocalDate endDate;
 
+    @Builder.Default
     @OneToMany(mappedBy = "event", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<Tournament> tournaments = new HashSet<>();
 
