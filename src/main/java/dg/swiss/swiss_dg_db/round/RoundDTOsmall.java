@@ -8,7 +8,7 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 public class RoundDTOsmall {
-    private int roundNumber;
-    private int roundRating;
-    private int roundScore;
+    private Integer roundNumber;
+    private Integer roundRating;
+    private Integer roundScore;
 }

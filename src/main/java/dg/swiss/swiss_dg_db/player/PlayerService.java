@@ -1,20 +1,17 @@
 package dg.swiss.swiss_dg_db.player;
 
-import dg.swiss.swiss_dg_db.event.EventRepository;
+import dg.swiss.swiss_dg_db.event.Event;
 import dg.swiss.swiss_dg_db.event.PlayerEventsDTO;
 import dg.swiss.swiss_dg_db.events.BeforeDeletePlayer;
-import dg.swiss.swiss_dg_db.round.RoundDTO;
 import dg.swiss.swiss_dg_db.round.RoundDTOsmall;
 import dg.swiss.swiss_dg_db.scrape.NameConverter;
 import dg.swiss.swiss_dg_db.scrape.PlayerDetails;
+import dg.swiss.swiss_dg_db.tournament.Tournament;
+import dg.swiss.swiss_dg_db.tournament.TournamentRepository;
 import dg.swiss.swiss_dg_db.util.NotFoundException;
 
 import java.io.IOException;
-import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import jakarta.transaction.Transactional;
 import org.springframework.context.ApplicationEventPublisher;
@@ -28,15 +25,15 @@ public class PlayerService {
     private final PlayerRepository playerRepository;
     private final ApplicationEventPublisher publisher;
     private final PlayerDetails playerDetails;
-    private final EventRepository eventRepository;
+    private final TournamentRepository tournamentRepository;
 
     public PlayerService(final PlayerRepository playerRepository,
                          final ApplicationEventPublisher publisher,
-                         final EventRepository eventRepository) {
+                         final TournamentRepository tournamentRepository) {
         this.playerRepository = playerRepository;
         this.publisher = publisher;
         this.playerDetails = new PlayerDetails();
-        this.eventRepository = eventRepository;
+        this.tournamentRepository = tournamentRepository;
     }
 
     public List<PlayerDTO> findAll() {
@@ -146,57 +143,25 @@ public class PlayerService {
     }
 
     public List<PlayerEventsDTO> getPlayerEvents(final Long id) {
-        List<Object[]> rawEvents = eventRepository.findRawEventsFromPlayer(id);
-        Map<Long, PlayerEventsDTO> eventMap = new HashMap<>();
-
-        for (Object[] raw : rawEvents) {
-            Long pk = (Long) raw[0];
-            Long eventId = (Long) raw[1];
-            String name = (String) raw[2];
-            String displayName = (String) raw[3];
-            String tier = (String) raw[4];
-            int year = (int) raw[5];
-            String city = (String) raw[6];
-            String country = (String) raw[7];
-            int numberPlayers = (int) raw[8];
-            int points = (int) raw[9];
-            double purse = raw[10] != null ? (double) raw[10] : 0;
-            boolean isChampionship = (boolean) raw[11];
-            boolean isSwisstour = (boolean) raw[12];
-            boolean hasResults = (boolean) raw[13];
-            String infoLink = (String) raw[14];
-            String registrationLink = (String) raw[15];
-            LocalDate registrationStart = (LocalDate) raw[16];
-            String swisstourType = (String) raw[17];
-            LocalDate startDate = (LocalDate) raw[18];
-            LocalDate endDate = (LocalDate) raw[19];
-            String division = (String) raw[20];
-            int tournamentPlace = (int) raw[21];
-            Integer tournamentRating = raw[22] != null ? (Integer) raw[22] : null;
-            double tournamentPrize = raw[23] != null ? (double) raw[23] : 0;
-            int tournamentScore = raw[24] != null ? (int) raw[24] : 0;
-            double tournamentPoints = (double) raw[25];
-
-            if (!eventMap.containsKey(pk)) {
-                List<RoundDTOsmall> rounds = new ArrayList<>();
-                // Create new PlayerEventsDTO with common fields
-                PlayerEventsDTO eventDTO = new PlayerEventsDTO(pk, eventId, name, displayName, tier, year,
-                        city, country, numberPlayers, points, purse,
-                        isChampionship, isSwisstour, hasResults, infoLink, registrationLink,
-                        registrationStart, swisstourType, startDate, endDate, division,
-                        tournamentPlace, tournamentRating, tournamentPrize,
-                        tournamentScore, tournamentPoints, rounds);
-                eventMap.put(pk, eventDTO);
-            }
-
-            // Extract round information
-            int roundNumber = raw[26] != null ? (int) raw[26] : 0;
-            int roundRating = raw[27] != null ? (int) raw[27] : 0;
-            int roundScore = raw[28] != null ? (int) raw[28] : 0;
-            RoundDTOsmall round = new RoundDTOsmall(roundNumber, roundRating, roundScore);
-            eventMap.get(pk).getRounds().add(round);
-        }
-
-        return new ArrayList<>(eventMap.values());
+        return tournamentRepository.findTournamentsWithEventAndRoundsByPlayerId(id)
+                .stream()
+                .map(t -> {
+                    Event e = t.getEvent();
+                    List<RoundDTOsmall> rounds = t.getRounds().stream()
+                            .map(r -> new RoundDTOsmall(r.getRoundNumber(), r.getRating(), r.getScore()))
+                            .toList();
+                    return new PlayerEventsDTO(
+                            e.getId(), e.getEventId(), e.getName(), e.getDisplayName(),
+                            e.getTier(), e.getYear(), e.getCity(), e.getCountry(),
+                            e.getNumberPlayers(), e.getPoints(), e.getPurse(),
+                            e.getIsChampionship(), e.getIsSwisstour(), e.getHasResults(),
+                            e.getInfoLink(), e.getRegistrationLink(), e.getRegistrationStart(),
+                            e.getSwisstourType(), e.getStartDate(), e.getEndDate(),
+                            t.getDivision(), t.getPlace(), t.getRating(),
+                            t.getPrize(), t.getScore(), t.getPoints(),
+                            rounds
+                    );
+                })
+                .toList();
     }
 }
