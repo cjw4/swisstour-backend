@@ -1,6 +1,6 @@
 package dg.swiss.swiss_dg_db.standings;
 
-import dg.swiss.swiss_dg_db.tournament.TournamentPointsDTO;
+import dg.swiss.swiss_dg_db.tournament.Tournament;
 import dg.swiss.swiss_dg_db.tournament.TournamentRepository;
 import org.springframework.stereotype.Service;
 
@@ -16,22 +16,22 @@ public class StandingService {
     }
 
     public List<StandingDTO> getStandings(String division, Integer year) {
-        List<TournamentPointsDTO> tournamentPointsDTOs = tournamentRepository.findTournamentPointsByDivision(division);
-        List<StandingDTO> standingDTOs = tournamentPointsDTOs.stream()
+        List<Tournament> tournaments = tournamentRepository.findTournamentsByDivision(division);
+        List<StandingDTO> standingDTOs = tournaments.stream()
                 // only include swisstour events
-                .filter(TournamentPointsDTO::getIsSwisstour)
+                .filter(t -> t.getEvent().getIsSwisstour())
                 // only include players with swisstour license
-                .filter(TournamentPointsDTO::getSwisstourLicense)
+                .filter(t -> t.getPlayer().getSwisstourLicense())
                 // only include from the particular year
-                .filter(t -> Objects.equals(t.getYear(), year))
-                // turn the TournamentPointsDTOs into StandingDTOs
-                .collect(Collectors.groupingBy(TournamentPointsDTO::getPlayerId))
+                .filter(t -> Objects.equals(t.getEvent().getYear(), year))
+                // turn the Tournaments into StandingDTOs
+                .collect(Collectors.groupingBy(t -> t.getPlayer().getId()))
                 .entrySet().stream()
                 .map(entry -> {
                     Long playerId = entry.getKey();
                     List<EventPointsDTO> eventPointsDTOs = entry.getValue().stream()
-                            .map(event ->
-                                    new EventPointsDTO(event.getEventId(), event.getPoints(), false))
+                            .map(t ->
+                                    new EventPointsDTO(t.getEvent().getEventId(), t.getPoints(), false))
                             .collect(Collectors.toList());
 
                     // Sort events by points in descending order

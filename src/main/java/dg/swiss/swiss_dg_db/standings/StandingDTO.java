@@ -1,6 +1,5 @@
 package dg.swiss.swiss_dg_db.standings;
 
-import dg.swiss.swiss_dg_db.tournament.TournamentPointsDTO;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
