@@ -4,7 +4,7 @@ import dg.swiss.swiss_dg_db.event.Event;
 import dg.swiss.swiss_dg_db.event.EventRepository;
 
 
-import org.junit.jupiter.api.Assertions;
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.jdbc.EmbeddedDatabaseConnection;
@@ -37,8 +37,8 @@ public class EventRepositoryTests {
         boolean exists = eventRepository.existsByEventId(event.getEventId());
 
         // Assert
-        Assertions.assertEquals(80000L, event.getEventId());
-        Assertions.assertTrue(exists);
+        Assertions.assertThat(event.getEventId()).isEqualTo(80000L);
+        Assertions.assertThat(exists).isTrue();
     }
 
     @Test
@@ -57,7 +57,7 @@ public class EventRepositoryTests {
         boolean exists = eventRepository.existsByEventId(70000L);
 
         // Assert
-        Assertions.assertFalse(exists);
+        Assertions.assertThat(exists).isFalse();
     }
 
 
