@@ -5,14 +5,17 @@ import jakarta.persistence.*;
 
 import java.util.HashSet;
 import java.util.Set;
-import lombok.Getter;
-import lombok.Setter;
+
+import lombok.*;
 
 
 @Entity
 @Table(name = "Players")
 @Getter
 @Setter
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
 public class Player {
 
     @Id
@@ -48,5 +51,4 @@ public class Player {
 
     @OneToMany(mappedBy = "player", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<Tournament> tournaments = new HashSet<>();
-
 }
