@@ -6,14 +6,17 @@ import jakarta.persistence.*;
 import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.Set;
-import lombok.Getter;
-import lombok.Setter;
+
+import lombok.*;
 
 
 @Entity
 @Table(name = "Events")
 @Getter
 @Setter
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
 public class Event {
 
     @Id
@@ -35,7 +38,7 @@ public class Event {
     @Column
     private String tier;
 
-    @Column(nullable = false)
+    @Column(name = "\"year\"", nullable = false)
     private Integer year;
 
     @Column
@@ -59,8 +62,9 @@ public class Event {
     @Column(nullable = false)
     private Boolean isSwisstour;
 
-    @Column(nullable = false, columnDefinition = "boolean default false not null")
-    private Boolean hasResults;
+    @Builder.Default
+    @Column(nullable = false)
+    private Boolean hasResults = false;
 
     @Column
     private String infoLink;

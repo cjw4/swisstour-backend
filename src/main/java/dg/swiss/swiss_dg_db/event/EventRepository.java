@@ -5,14 +5,11 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.util.List;
-import java.util.Optional;
 
 
 public interface EventRepository extends JpaRepository<Event, Long> {
 
     boolean existsByEventId(Long eventId);
-
-    Optional<Event> findByEventId(Long eventId);
 
     @Query("SELECT e.id, e.eventId, e.name, e.displayName, e.tier, e.year, e.city, e.country, e.numberPlayers, e.points, e.purse, e.isChampionship, e.isSwisstour, e.hasResults," +
             " e.infoLink, e.registrationLink, e.registrationStart, e.swisstourType, e.startDate, e.endDate," +

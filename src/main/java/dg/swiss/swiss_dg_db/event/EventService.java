@@ -14,7 +14,6 @@ import dg.swiss.swiss_dg_db.util.NotFoundException;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.Optional;
 
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
@@ -81,12 +80,6 @@ public class EventService {
 
     public EventDTO get(final Long id) {
         return eventRepository.findById(id)
-                .map(event -> mapToDTO(event, new EventDTO()))
-                .orElseThrow(NotFoundException::new);
-    }
-
-    public EventDTO getByEventId(final Long eventId) {
-        return eventRepository.findByEventId(eventId)
                 .map(event -> mapToDTO(event, new EventDTO()))
                 .orElseThrow(NotFoundException::new);
     }
