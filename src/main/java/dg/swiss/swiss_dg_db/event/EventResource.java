@@ -38,16 +38,7 @@ public class EventResource {
             @RequestParam(required = false) Integer year,
             @RequestParam(required = false) String division)
     {
-        if (year == null && division == null) {
-            return ResponseEntity.ok(eventService.findAll());
-        }
-        if (year != null && division == null) {
-            return ResponseEntity.ok(eventService.findByYear(year));
-        }
-        if (year == null) {
-            return ResponseEntity.noContent().build();
-        }
-        return ResponseEntity.ok(eventService.findByYearAndDivision(year, division));
+        return ResponseEntity.ok(eventService.findAll(year, division));
     }
 
     @GetMapping("/{id}")
@@ -62,8 +53,8 @@ public class EventResource {
             throw new EventAlreadyExistsException();
         }
         EventDTO eventDTOwDetails = eventService.addDetails(eventDTO);
-        eventService.create(eventDTOwDetails);
-        return new ResponseEntity<>(eventDTOwDetails, HttpStatus.CREATED);
+        EventDTO createdEventDTO = eventService.create(eventDTOwDetails);
+        return new ResponseEntity<>(createdEventDTO, HttpStatus.CREATED);
 
     }
 
@@ -119,16 +110,6 @@ public class EventResource {
     public ResponseEntity<Void> deleteEvent(@PathVariable(name = "id") final Long id) {
         eventService.delete(id);
         return ResponseEntity.noContent().build();
-    }
-
-    // This endpoint is now redundant with the new implementation of getEvents, it can be deleted when the frontend endpoints have been updated
-    @GetMapping("/year/{year}")
-    public ResponseEntity<List<EventDTO>> getEventsByYear(@PathVariable Integer year, @RequestParam(required = false) String division) {
-        if (division != null) {
-            return ResponseEntity.ok(eventService.findByYearAndDivision(year, division));
-        } else {
-            return ResponseEntity.ok(eventService.findByYear(year));
-        }
     }
 
 }

@@ -17,12 +17,14 @@ import java.util.List;
 
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 
 @Service
+@RequiredArgsConstructor
 public class EventService {
 
     private final EventRepository eventRepository;
@@ -33,49 +35,39 @@ public class EventService {
     private final RoundResource roundResource;
     private final RoundRepository roundRepository;
 
-    public EventService(final EventRepository eventRepository,
-                        final ApplicationEventPublisher publisher,
-                        final EventDetails eventDetails,
-                        final PlayerService playerService,
-                        final TournamentService tournamentService,
-                        final RoundResource roundResource, RoundRepository roundRepository) {
-        this.eventRepository = eventRepository;
-        this.publisher = publisher;
-        this.eventDetails = eventDetails;
-        this.playerService = playerService;
-        this.tournamentService = tournamentService;
-        this.roundResource = roundResource;
-        this.roundRepository = roundRepository;
-    }
-
-    public List<EventDTO> findAll() {
-        final List<Event> events = eventRepository.findAll(Sort.by("startDate"));
-        return events.stream()
-                .map(event -> mapToDTO(event, new EventDTO()))
-                .toList();
-    }
-
-
-    public List<EventDTO> findByYear(Integer year) {
-        final List<Event> events = eventRepository.findAll(Sort.by("startDate"));
-        return events.stream()
-                .filter(event -> event.getYear().equals(year))
-                .map(event -> mapToDTO(event, new EventDTO()))
-                .toList();
-    }
-
     @Transactional
-    public List<EventDTO> findByYearAndDivision(Integer year, String division) {
-        final List<Event> events = eventRepository.findAll(Sort.by("startDate"));
-        return events
-                .stream()
-                .filter(event -> event.getYear().equals(year))
-                .filter(event -> {
-                    var tournaments = event.getTournaments();
-                    return tournaments.stream().anyMatch(t -> t.getDivision().equals(division));
-                })
-                .map(event -> mapToDTO(event, new EventDTO()))
-                .toList();
+    public List<EventDTO> findAll(Integer year, String division) {
+        List<Event> events = eventRepository.findAll(Sort.by("startDate"));
+        if (year == null && division == null) {
+            return events.stream()
+                    .map(e -> mapToDTO(e, new EventDTO()))
+                    .toList();
+        }
+        if (division == null) {
+            return events.stream()
+                    .filter(e -> e.getYear().equals(year))
+                    .map(e-> mapToDTO(e, new EventDTO()))
+                    .toList();
+        }
+        if (year == null) {
+            return events.stream()
+                    .filter(e -> {
+                        var tournaments = e.getTournaments();
+                        return tournaments.stream().anyMatch(t -> t.getDivision().equals(division));
+                    })
+                    .map(e -> mapToDTO(e, new EventDTO()))
+                    .toList();
+        } else {
+            return events
+                    .stream()
+                    .filter(e -> e.getYear().equals(year))
+                    .filter(e -> {
+                        var tournaments = e.getTournaments();
+                        return tournaments.stream().anyMatch(t -> t.getDivision().equals(division));
+                    })
+                    .map(e -> mapToDTO(e, new EventDTO()))
+                    .toList();
+        }
     }
 
     public EventDTO get(final Long id) {
@@ -210,10 +202,10 @@ public class EventService {
 
     public EventDTO create(final EventDTO eventDTO) {
         final Event event = new Event();
+        eventDTO.setHasResults(false);
         mapToEntity(eventDTO, event);
-        event.setHasResults(false);
-        eventRepository.save(event);
-        eventDTO.setId(event.getId());
+        Event savedEvent = eventRepository.save(event);
+        eventDTO.setId(savedEvent.getId());
         return eventDTO;
     }
 
