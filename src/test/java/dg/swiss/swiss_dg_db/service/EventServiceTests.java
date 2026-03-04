@@ -22,7 +22,7 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Set;
 
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 @DisplayName("EventService Unit Tests")
@@ -112,6 +112,7 @@ public class EventServiceTests {
             // Assert
             Assertions.assertThat(result).isNotNull();
             Assertions.assertThat(result).hasSize(2);
+            verify(eventRepository, times(1)).findAll(Sort.by("startDate"));
         }
 
         @Test
@@ -128,6 +129,7 @@ public class EventServiceTests {
             Assertions.assertThat(result).isNotNull();
             Assertions.assertThat(result).hasSize(1);
             Assertions.assertThat(result.getFirst().getYear()).isEqualTo(2024);
+            verify(eventRepository, times(1)).findAll(Sort.by("startDate"));
         }
 
         @Test
@@ -143,6 +145,7 @@ public class EventServiceTests {
             // Assert
             Assertions.assertThat(result).isNotNull();
             Assertions.assertThat(result).hasSize(1);
+            verify(eventRepository, times(1)).findAll(Sort.by("startDate"));
         }
 
         @Test
@@ -158,6 +161,7 @@ public class EventServiceTests {
             // Assert
             Assertions.assertThat(result).isNotNull();
             Assertions.assertThat(result).hasSize(1);
+            verify(eventRepository, times(1)).findAll(Sort.by("startDate"));
         }
     }
 
