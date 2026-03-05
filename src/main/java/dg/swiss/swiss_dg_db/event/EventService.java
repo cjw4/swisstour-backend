@@ -36,7 +36,7 @@ public class EventService {
     private final RoundRepository roundRepository;
 
     @Transactional
-    public List<EventDTO> findAll(Integer year, String division) {
+    public List<EventDTO> getEvents(Integer year, String division) {
         List<Event> events = eventRepository.findAll(Sort.by("startDate"));
         if (year == null && division == null) {
             return events.stream()
@@ -70,7 +70,7 @@ public class EventService {
         }
     }
 
-    public EventDTO get(final Long id) {
+    public EventDTO getEvent(final Long id) {
         return eventRepository.findById(id)
                 .map(event -> mapToDTO(event, new EventDTO()))
                 .orElseThrow(NotFoundException::new);

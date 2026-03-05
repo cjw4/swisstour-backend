@@ -6,6 +6,7 @@ import dg.swiss.swiss_dg_db.event.EventRepository;
 import dg.swiss.swiss_dg_db.event.EventService;
 import dg.swiss.swiss_dg_db.player.Player;
 import dg.swiss.swiss_dg_db.tournament.Tournament;
+import dg.swiss.swiss_dg_db.util.NotFoundException;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -20,6 +21,7 @@ import org.springframework.data.domain.Sort;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 import static org.mockito.Mockito.*;
@@ -93,21 +95,20 @@ public class EventServiceTests {
                 .startDate(LocalDate.of(2025,7,4))
                 .tournaments(Set.of(tournamentMPO))
                 .build();
-
     }
 
     @Nested
-    @DisplayName("findAll() method tests")
-    class FindAllTests {
+    @DisplayName("getEvents() method tests")
+    class GetEventsTests {
         @Test
         @DisplayName("no inputs")
-        void EventService_findAllNoInputs_ReturnsListOfEventDTO() {
+        void EventService_getEventsNoInputs_ReturnsListOfEventDTO() {
             // Arrange
             when(eventRepository.findAll(Sort.by("startDate")))
                     .thenReturn(List.of(event2024, event2025));
 
             // Act
-            List<EventDTO> result = eventService.findAll(null, null);
+            List<EventDTO> result = eventService.getEvents(null, null);
 
             // Assert
             Assertions.assertThat(result).isNotNull();
@@ -117,13 +118,13 @@ public class EventServiceTests {
 
         @Test
         @DisplayName("year as input")
-        void EventService_findAllWithYear_ReturnsListOfEventDTO() {
+        void EventService_getEventsWithYear_ReturnsListOfEventDTO() {
             // Arrange
             when(eventRepository.findAll(Sort.by("startDate")))
                     .thenReturn(List.of(event2024, event2025));
 
             // Act
-            List<EventDTO> result = eventService.findAll(2024, null);
+            List<EventDTO> result = eventService.getEvents(2024, null);
 
             // Assert
             Assertions.assertThat(result).isNotNull();
@@ -134,13 +135,13 @@ public class EventServiceTests {
 
         @Test
         @DisplayName("division as input")
-        void EventService_findAllWithDivision_ReturnsListOfEventDTO() {
+        void EventService_getEventsWithDivision_ReturnsListOfEventDTO() {
             // Arrange
             when(eventRepository.findAll(Sort.by("startDate")))
                     .thenReturn(List.of(event2024, event2025));
 
             // Act
-            List<EventDTO> result = eventService.findAll(null, "MPO");
+            List<EventDTO> result = eventService.getEvents(null, "MPO");
 
             // Assert
             Assertions.assertThat(result).isNotNull();
@@ -150,13 +151,13 @@ public class EventServiceTests {
 
         @Test
         @DisplayName("year and division as input")
-        void EventService_findAllWithYearAndDivision_ReturnsListOfEventDTO() {
+        void EventService_getEventsWithYearAndDivision_ReturnsListOfEventDTO() {
             // Arrange
             when(eventRepository.findAll(Sort.by("startDate")))
                     .thenReturn(List.of(event2024, event2025, event2025MPO));
 
             // Act
-            List<EventDTO> result = eventService.findAll(2024, "MPO");
+            List<EventDTO> result = eventService.getEvents(2024, "MPO");
 
             // Assert
             Assertions.assertThat(result).isNotNull();
@@ -165,7 +166,38 @@ public class EventServiceTests {
         }
     }
 
+    @Nested
+    @DisplayName("getEvent() method tests")
+    class GetEventTests {
+        @Test
+        @DisplayName("test valid id")
+        void TestWhenIdIsValid() {
+            // Arrange
+            when(eventRepository.findById(event2024.getId()))
+                    .thenReturn(Optional.of(event2024));
 
+            // Act
+            EventDTO result = eventService.getEvent(event2024.getId());
+
+            // Assert
+            Assertions.assertThat(result).isNotNull();
+            Assertions.assertThat(result.getId()).isEqualTo(event2024.getId());
+            verify(eventRepository, times(1)).findById(event2024.getId());
+        }
+
+        @Test
+        @DisplayName("test invalid id")
+        void TestWhenIdIsInvalid() {
+            // Arrange
+            when(eventRepository.findById(event2024.getId()))
+                    .thenReturn(Optional.empty());
+
+            // Act & Assert
+            Assertions.assertThatThrownBy(() -> eventService.getEvent(event2024.getId()))
+                    .isInstanceOf(NotFoundException.class);
+            verify(eventRepository, times(1)).findById(event2024.getId());
+        }
+    }
 
     @Test
     void EventService_create_ReturnsEventDTO() {

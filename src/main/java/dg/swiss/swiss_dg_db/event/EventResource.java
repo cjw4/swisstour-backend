@@ -32,12 +32,12 @@ public class EventResource {
             @RequestParam(required = false) Integer year,
             @RequestParam(required = false) String division)
     {
-        return ResponseEntity.ok(eventService.findAll(year, division));
+        return ResponseEntity.ok(eventService.getEvents(year, division));
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<EventDTO> getEvent(@PathVariable(name = "id") final Long id) {
-        return ResponseEntity.ok(eventService.get(id));
+        return ResponseEntity.ok(eventService.getEvent(id));
     }
 
     @PostMapping

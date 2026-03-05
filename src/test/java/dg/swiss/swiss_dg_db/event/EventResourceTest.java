@@ -1,7 +1,7 @@
 package dg.swiss.swiss_dg_db.event;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -15,6 +15,8 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
+
+import dg.swiss.swiss_dg_db.util.NotFoundException;
 
 import java.util.List;
 
@@ -44,6 +46,7 @@ class EventResourceTest {
     @BeforeEach
     void setUp() {
         eventDTO = EventDTO.builder()
+                .id(1L)
                 .eventId(1L)
                 .points(100)
                 .isChampionship(false)
@@ -58,7 +61,7 @@ class EventResourceTest {
         @DisplayName("test successful response")
         void EventResource_getEventsSuccess_Returns200() throws Exception {
             // Arrange
-            when(eventService.findAll(any(Integer.class), isNull()))
+            when(eventService.getEvents(any(Integer.class), isNull()))
                     .thenReturn(List.of(eventDTO));
 
             // Act
@@ -67,7 +70,41 @@ class EventResourceTest {
 
             // Assert
             response.andExpect(MockMvcResultMatchers.status().isOk());
-            verify(eventService, times(1)).findAll(any(Integer.class), isNull());
+            verify(eventService, times(1)).getEvents(any(Integer.class), isNull());
+        }
+    }
+
+    @Nested
+    @DisplayName("getEvent() method tests")
+    class GetEventTest {
+        @Test
+        @DisplayName("test successful response")
+        void EventResource_getEventSuccess_Returns200() throws Exception {
+            // Arrange
+            when(eventService.getEvent(eventDTO.getId()))
+                    .thenReturn(eventDTO);
+
+            // Act
+            ResultActions response = mockMvc.perform(MockMvcRequestBuilders.get("/api/events/1"));
+
+            // Assert
+            response.andExpect(MockMvcResultMatchers.status().isOk());
+            verify(eventService, times(1)).getEvent(eventDTO.getId());
+        }
+
+        @Test
+        @DisplayName("test event not found")
+        void EventResource_getEventNotFound_Returns404() throws Exception {
+            // Arrange
+            when(eventService.getEvent(eventDTO.getId()))
+                    .thenThrow(new NotFoundException());
+
+            // Act
+            ResultActions response = mockMvc.perform(MockMvcRequestBuilders.get("/api/events/1"));
+
+            // Assert
+            response.andExpect(MockMvcResultMatchers.status().isNotFound());
+            verify(eventService, times(1)).getEvent(eventDTO.getId());
         }
     }
 
