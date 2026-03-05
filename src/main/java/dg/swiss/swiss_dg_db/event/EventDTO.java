@@ -13,6 +13,7 @@ import lombok.*;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@EqualsAndHashCode
 public class EventDTO {
 
     private Long id;

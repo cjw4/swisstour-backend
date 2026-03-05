@@ -2,7 +2,6 @@ package dg.swiss.swiss_dg_db.event;
 
 import dg.swiss.swiss_dg_db.exceptions.EventAlreadyExistsException;
 import dg.swiss.swiss_dg_db.exceptions.TooManyRequestsException;
-import dg.swiss.swiss_dg_db.player.PlayerService;
 import dg.swiss.swiss_dg_db.scrape.EventDetails;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -12,6 +11,7 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Objects;
 
+import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -20,17 +20,11 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping(value = "/api/events", produces = MediaType.APPLICATION_JSON_VALUE)
 @Tag(name = "Events")
+@AllArgsConstructor
 public class EventResource {
 
     private final EventService eventService;
     private final EventRepository eventRepository;
-
-    public EventResource(final EventService eventService,
-                         final PlayerService playerService,
-                         final EventRepository eventRepository, EventDetails eventDetails) {
-        this.eventService = eventService;
-        this.eventRepository = eventRepository;
-    }
 
     @GetMapping
     @SecurityRequirement(name = "bearerAuth")
