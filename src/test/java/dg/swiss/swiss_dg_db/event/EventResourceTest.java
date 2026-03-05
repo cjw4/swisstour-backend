@@ -1,6 +1,7 @@
 package dg.swiss.swiss_dg_db.event;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.AllArgsConstructor;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -12,7 +13,10 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
+
+import java.util.List;
 
 import static org.mockito.Mockito.*;
 
@@ -35,11 +39,6 @@ class EventResourceTest {
     @Autowired
     private ObjectMapper objectMapper;
 
-    @Test
-    @DisplayName("test getEvents()")
-    void getEvents() {
-    }
-
     private EventDTO eventDTO;
 
     @BeforeEach
@@ -50,6 +49,26 @@ class EventResourceTest {
                 .isChampionship(false)
                 .isSwisstour(true)
                 .build();
+    }
+
+    @Nested
+    @DisplayName("getEvents() method tests")
+    class GetEventsTest {
+        @Test
+        @DisplayName("test successful response")
+        void EventResource_getEventsSuccess_Returns200() throws Exception {
+            // Arrange
+            when(eventService.findAll(any(Integer.class), isNull()))
+                    .thenReturn(List.of(eventDTO));
+
+            // Act
+            ResultActions response = mockMvc.perform(MockMvcRequestBuilders.get("/api/events")
+                    .param("year", "2025"));
+
+            // Assert
+            response.andExpect(MockMvcResultMatchers.status().isOk());
+            verify(eventService, times(1)).findAll(any(Integer.class), isNull());
+        }
     }
 
     @Nested
