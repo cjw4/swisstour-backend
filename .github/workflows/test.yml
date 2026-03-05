@@ -1,13 +1,13 @@
-name: Build & Deploy Spring App
+name: Run Unit Tests
 
 on:
-  push:
+  pull_request:
     branches:
       - main
 
 jobs:
-  build-deploy:
-    name: Build and Deploy SwisstourApp
+  test:
+    name: Run Unit Tests
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -21,8 +21,3 @@ jobs:
 
       - name: Run unit tests
         run: mvn -B test --file pom.xml
-
-      - name: Build the application
-        run: |
-          mvn clean
-          mvn -B package --file pom.xml
