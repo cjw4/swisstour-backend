@@ -1,6 +1,5 @@
-package dg.swiss.swiss_dg_db;
+package dg.swiss.swiss_dg_db.scrape;
 
-import dg.swiss.swiss_dg_db.scrape.LocationConverter;
 import dg.swiss.swiss_dg_db.scrape.LocationConverter.LocationInfo;
 import org.junit.jupiter.api.Test;
 

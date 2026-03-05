@@ -1,7 +1,5 @@
-package dg.swiss.swiss_dg_db.repository;
+package dg.swiss.swiss_dg_db.player;
 
-import dg.swiss.swiss_dg_db.player.Player;
-import dg.swiss.swiss_dg_db.player.PlayerRepository;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

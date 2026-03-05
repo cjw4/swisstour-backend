@@ -1,9 +1,5 @@
-package dg.swiss.swiss_dg_db.service;
+package dg.swiss.swiss_dg_db.event;
 
-import dg.swiss.swiss_dg_db.event.Event;
-import dg.swiss.swiss_dg_db.event.EventDTO;
-import dg.swiss.swiss_dg_db.event.EventRepository;
-import dg.swiss.swiss_dg_db.event.EventService;
 import dg.swiss.swiss_dg_db.player.Player;
 import dg.swiss.swiss_dg_db.tournament.Tournament;
 import dg.swiss.swiss_dg_db.util.NotFoundException;

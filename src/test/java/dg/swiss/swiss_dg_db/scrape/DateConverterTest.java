@@ -1,6 +1,5 @@
-package dg.swiss.swiss_dg_db;
+package dg.swiss.swiss_dg_db.scrape;
 
-import dg.swiss.swiss_dg_db.scrape.DateConverter;
 import dg.swiss.swiss_dg_db.scrape.DateConverter.DateInfo;
 import org.junit.jupiter.api.Test;
 

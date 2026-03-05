@@ -1,7 +1,4 @@
-package dg.swiss.swiss_dg_db.repository;
-
-import dg.swiss.swiss_dg_db.event.Event;
-import dg.swiss.swiss_dg_db.event.EventRepository;
+package dg.swiss.swiss_dg_db.event;
 
 
 import org.assertj.core.api.Assertions;

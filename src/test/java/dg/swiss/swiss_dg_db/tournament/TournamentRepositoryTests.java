@@ -1,4 +1,4 @@
-package dg.swiss.swiss_dg_db.repository;
+package dg.swiss.swiss_dg_db.tournament;
 
 import dg.swiss.swiss_dg_db.event.Event;
 import dg.swiss.swiss_dg_db.event.EventRepository;
@@ -6,8 +6,6 @@ import dg.swiss.swiss_dg_db.player.Player;
 import dg.swiss.swiss_dg_db.player.PlayerRepository;
 import dg.swiss.swiss_dg_db.round.Round;
 import dg.swiss.swiss_dg_db.round.RoundRepository;
-import dg.swiss.swiss_dg_db.tournament.Tournament;
-import dg.swiss.swiss_dg_db.tournament.TournamentRepository;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
