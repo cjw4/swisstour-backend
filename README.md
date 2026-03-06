@@ -86,6 +86,23 @@ Each of the resource classes are annotated as a Spring Boot @RestController and 
   - `DELETE /api/players/{id}`
   - All other requests are permitted.
 
+## CI/CD Pipeline
+
+The project uses two GitHub Actions workflows to automate testing and deployment.
+
+### On Pull Request to `main` — `test.yml`
+- Triggers on any pull request targeting the `main` branch.
+- Checks out the code and sets up JDK 21.
+- Runs the full unit test suite with Maven (`mvn test`).
+- The test job must pass before the pull request can be merged (enforced via branch protection rules).
+
+### On Merge to `main` — `build-docker-image.yml`
+- Triggers on push to `main` (i.e. when a pull request is merged).
+- Checks out the code and sets up JDK 21.
+- Builds the application with Maven (`mvn package`).
+- Logs in to Docker Hub using repository secrets.
+- Builds and pushes the Docker image to Docker Hub tagged as `latest`.
+
 ## Development
 
 The backend (this repository) is written using Spring Boot and was initially kick-started using Bootify.io.
