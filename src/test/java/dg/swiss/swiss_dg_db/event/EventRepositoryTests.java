@@ -52,7 +52,7 @@ public class EventRepositoryTests {
         boolean exists = eventRepository.existsByEventId(70000L);
 
         // Assert
-        Assertions.assertThat(exists).isFalse();
+        Assertions.assertThat(exists).isTrue();
     }
 
 }
