@@ -86,6 +86,16 @@ Each of the resource classes are annotated as a Spring Boot @RestController and 
   - `DELETE /api/players/{id}`
   - All other requests are permitted.
 
+## CI/CD Pipeline
+
+The production code lives on the main branch. In order to ensure app stability and latest availability, the following 
+CI/CD pipeline has been implemented.
+
+  - The `main` branch is protected from direct commits and can only be edited through pull requests.
+  - Pull requests must pass the full unit test suite before being merged into `main`.
+  - All pushes to `main` (i.e. when a pull request is merged) trigger an image build and push to Docker Hub.
+  - Following a successful build, the app gets deployed.
+
 ## Development
 
 The backend (this repository) is written using Spring Boot and was initially kick-started using Bootify.io.
