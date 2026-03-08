@@ -1,4 +1,4 @@
-name: Run Unit Tests
+name: Spotless Formatting Check
 
 on:
   pull_request:
@@ -6,8 +6,8 @@ on:
       - main
 
 jobs:
-  unit-test:
-    name: Run Unit Tests
+  spotless-check:
+    name: Spotless Formatting Check
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -18,6 +18,7 @@ jobs:
         with:
           distribution: 'temurin'
           java-version: '21'
+          cache: 'maven'
 
-      - name: Run unit tests
-        run: mvn -B test
+      - name: Run Spotless check
+        run: mvn -B spotless:check
