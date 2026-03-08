@@ -1,14 +1,11 @@
 package dg.swiss.swiss_dg_db.event;
 
 import dg.swiss.swiss_dg_db.tournament.Tournament;
-
 import jakarta.persistence.*;
-
-import lombok.*;
-
 import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.Set;
+import lombok.*;
 
 @Entity
 @Table(name = "Events")

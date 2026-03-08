@@ -1,7 +1,6 @@
 package dg.swiss.swiss_dg_db.round;
 
 import jakarta.validation.constraints.NotNull;
-
 import lombok.Getter;
 import lombok.Setter;
 

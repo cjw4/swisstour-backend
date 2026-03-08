@@ -1,8 +1,7 @@
 package dg.swiss.swiss_dg_db.scrape;
 
-import lombok.Getter;
-
 import java.util.Arrays;
+import lombok.Getter;
 
 public class NameConverter {
 

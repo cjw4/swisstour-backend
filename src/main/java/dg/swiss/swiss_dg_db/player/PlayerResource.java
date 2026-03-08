@@ -1,20 +1,16 @@
 package dg.swiss.swiss_dg_db.player;
 
 import dg.swiss.swiss_dg_db.event.PlayerEventsDTO;
-
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
-
 import jakarta.validation.Valid;
-
+import java.io.IOException;
+import java.util.List;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.io.IOException;
-import java.util.List;
 
 @RestController
 @RequestMapping(value = "/api/players", produces = MediaType.APPLICATION_JSON_VALUE)

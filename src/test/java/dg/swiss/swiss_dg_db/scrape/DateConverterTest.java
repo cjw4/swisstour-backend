@@ -3,10 +3,8 @@ package dg.swiss.swiss_dg_db.scrape;
 import static org.junit.jupiter.api.Assertions.*;
 
 import dg.swiss.swiss_dg_db.scrape.DateConverter.DateInfo;
-
-import org.junit.jupiter.api.Test;
-
 import java.time.LocalDate;
+import org.junit.jupiter.api.Test;
 
 public class DateConverterTest {
 

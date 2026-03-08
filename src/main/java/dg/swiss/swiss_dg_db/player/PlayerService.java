@@ -8,15 +8,12 @@ import dg.swiss.swiss_dg_db.scrape.NameConverter;
 import dg.swiss.swiss_dg_db.scrape.PlayerDetails;
 import dg.swiss.swiss_dg_db.tournament.TournamentRepository;
 import dg.swiss.swiss_dg_db.util.NotFoundException;
-
 import jakarta.transaction.Transactional;
-
+import java.io.IOException;
+import java.util.List;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
-
-import java.io.IOException;
-import java.util.List;
 
 @Service
 public class PlayerService {

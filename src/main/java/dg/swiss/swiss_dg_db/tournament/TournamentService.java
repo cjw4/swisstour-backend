@@ -9,13 +9,11 @@ import dg.swiss.swiss_dg_db.player.Player;
 import dg.swiss.swiss_dg_db.player.PlayerRepository;
 import dg.swiss.swiss_dg_db.util.NotFoundException;
 import dg.swiss.swiss_dg_db.util.ReferencedException;
-
+import java.util.List;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.event.EventListener;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
 
 @Service
 public class TournamentService {

@@ -1,13 +1,10 @@
 package dg.swiss.swiss_dg_db.player;
 
 import dg.swiss.swiss_dg_db.tournament.Tournament;
-
 import jakarta.persistence.*;
-
-import lombok.*;
-
 import java.util.HashSet;
 import java.util.Set;
+import lombok.*;
 
 @Entity
 @Table(name = "Players")

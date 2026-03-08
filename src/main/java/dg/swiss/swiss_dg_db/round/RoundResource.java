@@ -3,7 +3,6 @@ package dg.swiss.swiss_dg_db.round;
 import dg.swiss.swiss_dg_db.tournament.Tournament;
 import dg.swiss.swiss_dg_db.tournament.TournamentRepository;
 import dg.swiss.swiss_dg_db.util.NotFoundException;
-
 import org.springframework.stereotype.Component;
 
 @Component

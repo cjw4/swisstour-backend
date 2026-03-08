@@ -3,22 +3,17 @@ package dg.swiss.swiss_dg_db.event;
 import dg.swiss.swiss_dg_db.exceptions.EventAlreadyExistsException;
 import dg.swiss.swiss_dg_db.exceptions.TooManyRequestsException;
 import dg.swiss.swiss_dg_db.scrape.EventDetails;
-
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
-
 import jakarta.validation.Valid;
-
+import java.io.IOException;
+import java.util.List;
+import java.util.Objects;
 import lombok.AllArgsConstructor;
-
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.io.IOException;
-import java.util.List;
-import java.util.Objects;
 
 @RestController
 @RequestMapping(value = "/api/events", produces = MediaType.APPLICATION_JSON_VALUE)

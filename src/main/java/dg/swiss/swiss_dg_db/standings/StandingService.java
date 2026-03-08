@@ -2,11 +2,9 @@ package dg.swiss.swiss_dg_db.standings;
 
 import dg.swiss.swiss_dg_db.tournament.Tournament;
 import dg.swiss.swiss_dg_db.tournament.TournamentRepository;
-
-import org.springframework.stereotype.Service;
-
 import java.util.*;
 import java.util.stream.Collectors;
+import org.springframework.stereotype.Service;
 
 @Service
 public class StandingService {

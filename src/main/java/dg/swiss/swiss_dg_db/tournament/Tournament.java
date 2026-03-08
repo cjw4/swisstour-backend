@@ -3,17 +3,14 @@ package dg.swiss.swiss_dg_db.tournament;
 import dg.swiss.swiss_dg_db.event.Event;
 import dg.swiss.swiss_dg_db.player.Player;
 import dg.swiss.swiss_dg_db.round.Round;
-
 import jakarta.persistence.*;
-
+import java.util.HashSet;
+import java.util.Set;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-
-import java.util.HashSet;
-import java.util.Set;
 
 @Entity
 @Table(name = "Tournaments")

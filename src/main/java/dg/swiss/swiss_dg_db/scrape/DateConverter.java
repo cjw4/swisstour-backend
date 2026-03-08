@@ -1,10 +1,9 @@
 package dg.swiss.swiss_dg_db.scrape;
 
-import lombok.Getter;
-
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
+import lombok.Getter;
 
 public class DateConverter {
 

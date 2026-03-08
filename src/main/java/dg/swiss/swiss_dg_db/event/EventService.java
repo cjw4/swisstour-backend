@@ -11,18 +11,14 @@ import dg.swiss.swiss_dg_db.scrape.NameConverter;
 import dg.swiss.swiss_dg_db.tournament.TournamentDTO;
 import dg.swiss.swiss_dg_db.tournament.TournamentService;
 import dg.swiss.swiss_dg_db.util.NotFoundException;
-
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
-
+import java.io.IOException;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
-
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
-
-import java.io.IOException;
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor

@@ -2,9 +2,7 @@ package dg.swiss.swiss_dg_db.security;
 
 import dg.swiss.swiss_dg_db.security.jwt.JwtUtil;
 import dg.swiss.swiss_dg_db.user.CustomUser;
-
 import io.swagger.v3.oas.annotations.tags.Tag;
-
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.*;

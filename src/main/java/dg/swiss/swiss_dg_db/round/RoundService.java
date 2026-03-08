@@ -2,7 +2,6 @@ package dg.swiss.swiss_dg_db.round;
 
 import dg.swiss.swiss_dg_db.events.BeforeDeleteTournament;
 import dg.swiss.swiss_dg_db.util.ReferencedException;
-
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Service;
 
