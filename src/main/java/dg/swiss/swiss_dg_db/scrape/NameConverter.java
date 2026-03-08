@@ -22,5 +22,4 @@ public class NameConverter {
         String lastName = names[names.length - 1];
         return new NameInfo(firstName, lastName);
     }
-
 }

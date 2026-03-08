@@ -1,8 +1,11 @@
 package dg.swiss.swiss_dg_db.event;
 
+import static org.mockito.Mockito.*;
+
 import dg.swiss.swiss_dg_db.player.Player;
 import dg.swiss.swiss_dg_db.tournament.Tournament;
 import dg.swiss.swiss_dg_db.util.NotFoundException;
+
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -20,17 +23,13 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
-import static org.mockito.Mockito.*;
-
 @ExtendWith(MockitoExtension.class)
 @DisplayName("EventService Unit Tests")
 public class EventServiceTests {
 
-    @Mock
-    private EventRepository eventRepository;
+    @Mock private EventRepository eventRepository;
 
-    @InjectMocks
-    private EventService eventService;
+    @InjectMocks private EventService eventService;
 
     private Event event2024;
     private Event event2025;
@@ -42,55 +41,52 @@ public class EventServiceTests {
 
     @BeforeEach
     public void setUp() {
-        paulMcBeth = Player.builder()
-                .firstname("Paul")
-                .lastname("McBeth")
-                .swisstourLicense(false)
-                .isPro(true)
-                .build();
-        silvaSaarinen = Player.builder()
-                .firstname("Silva")
-                .lastname("Saarinen")
-                .swisstourLicense(false)
-                .isPro(true)
-                .build();
-        tournamentMPO = Tournament.builder()
-                .division("MPO")
-                .place(1)
-                .player(paulMcBeth)
-                .build();
-        tournamentFPO = Tournament.builder()
-                .division("FPO")
-                .place(1)
-                .player(silvaSaarinen)
-                .build();
-        event2024 = Event.builder()
-                .id(1L)
-                .year(2024)
-                .points(100)
-                .isChampionship(false)
-                .isSwisstour(true)
-                .startDate(LocalDate.of(2024,10,31))
-                .tournaments(Set.of(tournamentMPO))
-                .build();
-        event2025 = Event.builder()
-                .id(1L)
-                .year(2025)
-                .points(200)
-                .isChampionship(false)
-                .isSwisstour(true)
-                .startDate(LocalDate.of(2025,7,4))
-                .tournaments(Set.of(tournamentFPO))
-                .build();
-        event2025MPO = Event.builder()
-                .id(1L)
-                .year(2025)
-                .points(200)
-                .isChampionship(false)
-                .isSwisstour(true)
-                .startDate(LocalDate.of(2025,7,4))
-                .tournaments(Set.of(tournamentMPO))
-                .build();
+        paulMcBeth =
+                Player.builder()
+                        .firstname("Paul")
+                        .lastname("McBeth")
+                        .swisstourLicense(false)
+                        .isPro(true)
+                        .build();
+        silvaSaarinen =
+                Player.builder()
+                        .firstname("Silva")
+                        .lastname("Saarinen")
+                        .swisstourLicense(false)
+                        .isPro(true)
+                        .build();
+        tournamentMPO = Tournament.builder().division("MPO").place(1).player(paulMcBeth).build();
+        tournamentFPO = Tournament.builder().division("FPO").place(1).player(silvaSaarinen).build();
+        event2024 =
+                Event.builder()
+                        .id(1L)
+                        .year(2024)
+                        .points(100)
+                        .isChampionship(false)
+                        .isSwisstour(true)
+                        .startDate(LocalDate.of(2024, 10, 31))
+                        .tournaments(Set.of(tournamentMPO))
+                        .build();
+        event2025 =
+                Event.builder()
+                        .id(1L)
+                        .year(2025)
+                        .points(200)
+                        .isChampionship(false)
+                        .isSwisstour(true)
+                        .startDate(LocalDate.of(2025, 7, 4))
+                        .tournaments(Set.of(tournamentFPO))
+                        .build();
+        event2025MPO =
+                Event.builder()
+                        .id(1L)
+                        .year(2025)
+                        .points(200)
+                        .isChampionship(false)
+                        .isSwisstour(true)
+                        .startDate(LocalDate.of(2025, 7, 4))
+                        .tournaments(Set.of(tournamentMPO))
+                        .build();
     }
 
     @Nested
@@ -169,8 +165,7 @@ public class EventServiceTests {
         @DisplayName("test valid id")
         void TestWhenIdIsValid() {
             // Arrange
-            when(eventRepository.findById(event2024.getId()))
-                    .thenReturn(Optional.of(event2024));
+            when(eventRepository.findById(event2024.getId())).thenReturn(Optional.of(event2024));
 
             // Act
             EventDTO result = eventService.getEvent(event2024.getId());
@@ -185,8 +180,7 @@ public class EventServiceTests {
         @DisplayName("test invalid id")
         void TestWhenIdIsInvalid() {
             // Arrange
-            when(eventRepository.findById(event2024.getId()))
-                    .thenReturn(Optional.empty());
+            when(eventRepository.findById(event2024.getId())).thenReturn(Optional.empty());
 
             // Act & Assert
             Assertions.assertThatThrownBy(() -> eventService.getEvent(event2024.getId()))
@@ -198,24 +192,26 @@ public class EventServiceTests {
     @Test
     void EventService_create_ReturnsEventDTO() {
         // Arrange
-        Event event = Event.builder()
-                .id(1L)
-                .year(2024)
-                .points(200)
-                .displayName("ZDGO")
-                .isChampionship(false)
-                .isSwisstour(true)
-                .eventId(80000L)
-                .hasResults(false)
-                .build();
-        EventDTO eventDTO = EventDTO.builder()
-                .year(2024)
-                .points(200)
-                .displayName("ZDGO")
-                .isChampionship(false)
-                .isSwisstour(true)
-                .eventId(80000L)
-                .build();
+        Event event =
+                Event.builder()
+                        .id(1L)
+                        .year(2024)
+                        .points(200)
+                        .displayName("ZDGO")
+                        .isChampionship(false)
+                        .isSwisstour(true)
+                        .eventId(80000L)
+                        .hasResults(false)
+                        .build();
+        EventDTO eventDTO =
+                EventDTO.builder()
+                        .year(2024)
+                        .points(200)
+                        .displayName("ZDGO")
+                        .isChampionship(false)
+                        .isSwisstour(true)
+                        .eventId(80000L)
+                        .build();
 
         // Act
         when(eventRepository.save(Mockito.any(Event.class))).thenReturn(event);
@@ -226,5 +222,4 @@ public class EventServiceTests {
         Assertions.assertThat(savedEventDTO.getId()).isEqualTo(event.getId());
         Assertions.assertThat(savedEventDTO.getHasResults()).isEqualTo(false);
     }
-
 }

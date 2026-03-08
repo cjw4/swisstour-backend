@@ -2,6 +2,7 @@ package dg.swiss.swiss_dg_db.scrape;
 
 import lombok.Getter;
 import lombok.Setter;
+
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -47,12 +48,13 @@ public class PlayerDetails {
     }
 
     private Boolean scrapePro(Document document) {
-        Element classificationElement = document.selectFirst("ul.player-info.info-list li.classification");
+        Element classificationElement =
+                document.selectFirst("ul.player-info.info-list li.classification");
         if (classificationElement != null) {
-            String classification = classificationElement.text().replace("Classification: ", "").trim();
+            String classification =
+                    classificationElement.text().replace("Classification: ", "").trim();
             return classification.equals("Professional");
         }
         return false;
-
     }
 }

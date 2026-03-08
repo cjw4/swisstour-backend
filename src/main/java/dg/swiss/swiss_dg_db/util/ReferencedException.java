@@ -1,12 +1,13 @@
 package dg.swiss.swiss_dg_db.util;
 
-import java.util.ArrayList;
-import java.util.stream.Collectors;
 import lombok.Getter;
 import lombok.Setter;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
+import java.util.ArrayList;
+import java.util.stream.Collectors;
 
 @ResponseStatus(HttpStatus.CONFLICT)
 @Getter
@@ -24,11 +25,8 @@ public class ReferencedException extends RuntimeException {
     public String getMessage() {
         String message = key;
         if (!params.isEmpty()) {
-            message += "," + params.stream()
-                    .map(Object::toString)
-                    .collect(Collectors.joining(","));
+            message += "," + params.stream().map(Object::toString).collect(Collectors.joining(","));
         }
         return message;
     }
-
 }

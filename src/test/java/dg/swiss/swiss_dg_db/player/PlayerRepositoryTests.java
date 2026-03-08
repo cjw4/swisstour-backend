@@ -11,19 +11,19 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 @AutoConfigureTestDatabase(connection = EmbeddedDatabaseConnection.H2)
 public class PlayerRepositoryTests {
 
-    @Autowired
-    private PlayerRepository playerRepository;
+    @Autowired private PlayerRepository playerRepository;
 
     @Test
     void PlayerRepository_existsByPdgaNumber_ReturnsTrue() {
         // Arrange
-        Player player = Player.builder()
-                .firstname("Paul")
-                .lastname("McBeth")
-                .pdgaNumber(27523L)
-                .swisstourLicense(false)
-                .isPro(true)
-                .build();
+        Player player =
+                Player.builder()
+                        .firstname("Paul")
+                        .lastname("McBeth")
+                        .pdgaNumber(27523L)
+                        .swisstourLicense(false)
+                        .isPro(true)
+                        .build();
 
         // Act
         playerRepository.save(player);
@@ -35,13 +35,14 @@ public class PlayerRepositoryTests {
     @Test
     void PlayerRepository_existsBySdaNumber_ReturnsTrue() {
         // Arrange
-        Player player = Player.builder()
-                .firstname("Paul")
-                .lastname("McBeth")
-                .sdaNumber(1001L)
-                .swisstourLicense(false)
-                .isPro(true)
-                .build();
+        Player player =
+                Player.builder()
+                        .firstname("Paul")
+                        .lastname("McBeth")
+                        .sdaNumber(1001L)
+                        .swisstourLicense(false)
+                        .isPro(true)
+                        .build();
 
         // Act
         playerRepository.save(player);
@@ -53,30 +54,33 @@ public class PlayerRepositoryTests {
     @Test
     void PlayerRepository_existsByFirstnameAndLastname_ReturnsTrue() {
         // Arrange
-        Player player = Player.builder()
-                .firstname("Paul")
-                .lastname("McBeth")
-                .swisstourLicense(false)
-                .isPro(true)
-                .build();
+        Player player =
+                Player.builder()
+                        .firstname("Paul")
+                        .lastname("McBeth")
+                        .swisstourLicense(false)
+                        .isPro(true)
+                        .build();
 
         // Act
         playerRepository.save(player);
 
         // Assert
-        Assertions.assertThat(playerRepository.existsByFirstnameAndLastname("Paul", "McBeth")).isTrue();
+        Assertions.assertThat(playerRepository.existsByFirstnameAndLastname("Paul", "McBeth"))
+                .isTrue();
     }
 
     @Test
     void PlayerRepository_findByPdgaNumber_ReturnsPlayer() {
         // Arrange
-        Player player = Player.builder()
-                .firstname("Paul")
-                .lastname("McBeth")
-                .pdgaNumber(27523L)
-                .swisstourLicense(false)
-                .isPro(true)
-                .build();
+        Player player =
+                Player.builder()
+                        .firstname("Paul")
+                        .lastname("McBeth")
+                        .pdgaNumber(27523L)
+                        .swisstourLicense(false)
+                        .isPro(true)
+                        .build();
 
         // Act
         playerRepository.save(player);
@@ -88,17 +92,19 @@ public class PlayerRepositoryTests {
     @Test
     void PlayerRepository_findByFirstnameAndLastname_ReturnsPlayer() {
         // Arrange
-        Player player = Player.builder()
-                .firstname("Paul")
-                .lastname("McBeth")
-                .swisstourLicense(false)
-                .isPro(true)
-                .build();
+        Player player =
+                Player.builder()
+                        .firstname("Paul")
+                        .lastname("McBeth")
+                        .swisstourLicense(false)
+                        .isPro(true)
+                        .build();
 
         // Act
         playerRepository.save(player);
 
         // Assert
-        Assertions.assertThat(playerRepository.findByFirstnameAndLastname("Paul", "McBeth")).isPresent();
+        Assertions.assertThat(playerRepository.findByFirstnameAndLastname("Paul", "McBeth"))
+                .isPresent();
     }
 }

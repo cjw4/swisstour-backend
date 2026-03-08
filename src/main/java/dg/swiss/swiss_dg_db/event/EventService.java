@@ -12,16 +12,17 @@ import dg.swiss.swiss_dg_db.tournament.TournamentDTO;
 import dg.swiss.swiss_dg_db.tournament.TournamentService;
 import dg.swiss.swiss_dg_db.util.NotFoundException;
 
-import java.io.IOException;
-import java.util.List;
-
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
+
 import lombok.RequiredArgsConstructor;
+
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -39,39 +40,41 @@ public class EventService {
     public List<EventDTO> getEvents(Integer year, String division) {
         List<Event> events = eventRepository.findAll(Sort.by("startDate"));
         if (year == null && division == null) {
-            return events.stream()
-                    .map(e -> mapToDTO(e, new EventDTO()))
-                    .toList();
+            return events.stream().map(e -> mapToDTO(e, new EventDTO())).toList();
         }
         if (division == null) {
             return events.stream()
                     .filter(e -> e.getYear().equals(year))
-                    .map(e-> mapToDTO(e, new EventDTO()))
+                    .map(e -> mapToDTO(e, new EventDTO()))
                     .toList();
         }
         if (year == null) {
             return events.stream()
-                    .filter(e -> {
-                        var tournaments = e.getTournaments();
-                        return tournaments.stream().anyMatch(t -> t.getDivision().equals(division));
-                    })
+                    .filter(
+                            e -> {
+                                var tournaments = e.getTournaments();
+                                return tournaments.stream()
+                                        .anyMatch(t -> t.getDivision().equals(division));
+                            })
                     .map(e -> mapToDTO(e, new EventDTO()))
                     .toList();
         } else {
-            return events
-                    .stream()
+            return events.stream()
                     .filter(e -> e.getYear().equals(year))
-                    .filter(e -> {
-                        var tournaments = e.getTournaments();
-                        return tournaments.stream().anyMatch(t -> t.getDivision().equals(division));
-                    })
+                    .filter(
+                            e -> {
+                                var tournaments = e.getTournaments();
+                                return tournaments.stream()
+                                        .anyMatch(t -> t.getDivision().equals(division));
+                            })
                     .map(e -> mapToDTO(e, new EventDTO()))
                     .toList();
         }
     }
 
     public EventDTO getEvent(final Long id) {
-        return eventRepository.findById(id)
+        return eventRepository
+                .findById(id)
                 .map(event -> mapToDTO(event, new EventDTO()))
                 .orElseThrow(NotFoundException::new);
     }
@@ -82,7 +85,8 @@ public class EventService {
             eventDTO.setName(eventDetails.getName());
             eventDTO.setStartDate(eventDetails.getDate());
             if (eventDetails.getNumberDays() > 0) {
-                eventDTO.setEndDate(eventDetails.getDate().plusDays(eventDetails.getNumberDays() - 1));
+                eventDTO.setEndDate(
+                        eventDetails.getDate().plusDays(eventDetails.getNumberDays() - 1));
             } else {
                 eventDTO.setEndDate(eventDetails.getDate());
             }
@@ -100,8 +104,7 @@ public class EventService {
 
     public EventDetails addTournaments(final Long id) throws IOException {
         // get the event by PK to retrieve the eventId for scraping
-        Event event = eventRepository.findById(id)
-                .orElseThrow(NotFoundException::new);
+        Event event = eventRepository.findById(id).orElseThrow(NotFoundException::new);
         Long eventId = event.getEventId();
         // go and get the event info again (in case anything has been updated on the pdga website)
         eventDetails.scrapeEventInfo(eventId);
@@ -110,7 +113,8 @@ public class EventService {
         return eventDetails;
     }
 
-    public void addPlayerFromEvent(EventDetails.TournamentDetail tournamentDetail) throws IOException, InterruptedException {
+    public void addPlayerFromEvent(EventDetails.TournamentDetail tournamentDetail)
+            throws IOException, InterruptedException {
         // Add player to database if not yet there
         Long pdgaNumber = tournamentDetail.getPdgaNumber();
         String name = tournamentDetail.getName();
@@ -120,8 +124,7 @@ public class EventService {
             // Catch the case of a player exists in the database, and they now have a pdga number
             if (playerService.nameExists(name)) {
                 playerDTO = playerService.findByName(name);
-            }
-            else {
+            } else {
                 playerDTO = new PlayerDTO();
             }
 
@@ -129,19 +132,23 @@ public class EventService {
             playerService.addDetails(playerDTO);
             Thread.sleep(2000);
             if (playerService.nameExists(name)) {
-                System.out.println("Updating player, now PDGA registered, in database: "
-                        + playerDTO.getFirstname() + " "
-                        + playerDTO.getLastname());
+                System.out.println(
+                        "Updating player, now PDGA registered, in database: "
+                                + playerDTO.getFirstname()
+                                + " "
+                                + playerDTO.getLastname());
                 playerService.update(playerDTO.getId(), playerDTO);
             } else {
                 playerDTO.setSwisstourLicense(false);
-                System.out.println("Adding registered PDGA player to database: " +
-                        playerDTO.getFirstname() + " "
-                        + playerDTO.getLastname());
+                System.out.println(
+                        "Adding registered PDGA player to database: "
+                                + playerDTO.getFirstname()
+                                + " "
+                                + playerDTO.getLastname());
                 playerService.create(playerDTO);
             }
 
-        // Search by Name
+            // Search by Name
         } else if (pdgaNumber == null && !playerService.nameExists(name)) {
             playerDTO = new PlayerDTO();
             String[] names = name.trim().split("\\s+");
@@ -150,15 +157,16 @@ public class EventService {
             playerDTO.setLastname(nameInfo.getLastName());
             playerDTO.setIsPro(false);
             playerDTO.setSwisstourLicense(false);
-            System.out.println("Adding non-registered PDGA player to database: "
-                    + playerDTO.getFirstname() + " "
-                    + playerDTO.getLastname());
+            System.out.println(
+                    "Adding non-registered PDGA player to database: "
+                            + playerDTO.getFirstname()
+                            + " "
+                            + playerDTO.getLastname());
             playerService.create(playerDTO);
         }
     }
 
-    public void addTournamentFromEvent(Long id,
-                                       EventDetails.TournamentDetail tournamentDetail) {
+    public void addTournamentFromEvent(Long id, EventDetails.TournamentDetail tournamentDetail) {
         Long pdgaNumber = tournamentDetail.getPdgaNumber();
         String name = tournamentDetail.getName();
         Long playerId = null;
@@ -194,10 +202,13 @@ public class EventService {
     }
 
     public void toggleHasResults(final Long id) {
-        eventRepository.findById(id).ifPresent(e -> {
-            e.setHasResults(!e.getHasResults());
-            eventRepository.save(e);
-        });
+        eventRepository
+                .findById(id)
+                .ifPresent(
+                        e -> {
+                            e.setHasResults(!e.getHasResults());
+                            eventRepository.save(e);
+                        });
     }
 
     public EventDTO create(final EventDTO eventDTO) {
@@ -210,24 +221,24 @@ public class EventService {
     }
 
     public void update(final Long id, final EventDTO eventDTO) {
-        final Event event = eventRepository.findById(id)
-                .orElseThrow(NotFoundException::new);
+        final Event event = eventRepository.findById(id).orElseThrow(NotFoundException::new);
         mapToEntity(eventDTO, event);
         eventRepository.save(event);
     }
 
     @Transactional
     public void delete(final Long id) {
-        final Event event = eventRepository.findById(id)
-                .orElseThrow(NotFoundException::new);
+        final Event event = eventRepository.findById(id).orElseThrow(NotFoundException::new);
         eventRepository.delete(event);
         publisher.publishEvent(new BeforeDeleteEvent(id));
     }
 
     @Transactional
     public void deleteTournaments(final Long id) {
-        Event event = eventRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Event not found:" + id));
+        Event event =
+                eventRepository
+                        .findById(id)
+                        .orElseThrow(() -> new EntityNotFoundException("Event not found:" + id));
         event.getTournaments().clear();
         eventRepository.save(event);
     }

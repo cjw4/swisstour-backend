@@ -9,14 +9,13 @@ import dg.swiss.swiss_dg_db.player.Player;
 import dg.swiss.swiss_dg_db.player.PlayerRepository;
 import dg.swiss.swiss_dg_db.util.NotFoundException;
 import dg.swiss.swiss_dg_db.util.ReferencedException;
-import java.util.List;
-import java.util.Optional;
 
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.event.EventListener;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 
 @Service
 public class TournamentService {
@@ -26,8 +25,10 @@ public class TournamentService {
     private final PlayerRepository playerRepository;
     private final ApplicationEventPublisher publisher;
 
-    public TournamentService(final TournamentRepository tournamentRepository,
-            final EventRepository eventRepository, final PlayerRepository playerRepository,
+    public TournamentService(
+            final TournamentRepository tournamentRepository,
+            final EventRepository eventRepository,
+            final PlayerRepository playerRepository,
             final ApplicationEventPublisher publisher) {
         this.tournamentRepository = tournamentRepository;
         this.eventRepository = eventRepository;
@@ -43,7 +44,8 @@ public class TournamentService {
     }
 
     public TournamentDTO get(final Long id) {
-        return tournamentRepository.findById(id)
+        return tournamentRepository
+                .findById(id)
                 .map(tournament -> mapToDTO(tournament, new TournamentDTO()))
                 .orElseThrow(NotFoundException::new);
     }
@@ -52,29 +54,40 @@ public class TournamentService {
         final Tournament tournament = new Tournament();
         mapToEntity(tournamentDTO, tournament);
         // save the tournament if it one does not already exist for that player
-        if (!tournamentRepository.existsByPlayerIdAndEventId(tournamentDTO.getPlayer(), tournamentDTO.getEvent())) {
-            this.playerRepository.findById(tournamentDTO.getPlayer())
-                    .ifPresentOrElse(player -> {
-                        System.out.println("Adding tournament to database for: " + player.getFirstname() + " " + player.getLastname());
-                    }, () -> {
-                        System.out.println("Player was not found in the database, no tournament created.");
-                    });
+        if (!tournamentRepository.existsByPlayerIdAndEventId(
+                tournamentDTO.getPlayer(), tournamentDTO.getEvent())) {
+            this.playerRepository
+                    .findById(tournamentDTO.getPlayer())
+                    .ifPresentOrElse(
+                            player -> {
+                                System.out.println(
+                                        "Adding tournament to database for: "
+                                                + player.getFirstname()
+                                                + " "
+                                                + player.getLastname());
+                            },
+                            () -> {
+                                System.out.println(
+                                        "Player was not found in the database, no tournament created.");
+                            });
             return tournamentRepository.save(tournament).getId();
         } else {
-            return tournamentRepository.findByPlayerIdAndEventId(tournamentDTO.getPlayer(), tournamentDTO.getEvent()).getId();
+            return tournamentRepository
+                    .findByPlayerIdAndEventId(tournamentDTO.getPlayer(), tournamentDTO.getEvent())
+                    .getId();
         }
     }
 
     public void update(final Long id, final TournamentDTO tournamentDTO) {
-        final Tournament tournament = tournamentRepository.findById(id)
-                .orElseThrow(NotFoundException::new);
+        final Tournament tournament =
+                tournamentRepository.findById(id).orElseThrow(NotFoundException::new);
         mapToEntity(tournamentDTO, tournament);
         tournamentRepository.save(tournament);
     }
 
     public void delete(final Long id) {
-        final Tournament tournament = tournamentRepository.findById(id)
-                .orElseThrow(NotFoundException::new);
+        final Tournament tournament =
+                tournamentRepository.findById(id).orElseThrow(NotFoundException::new);
         publisher.publishEvent(new BeforeDeleteTournament(id));
         tournamentRepository.delete(tournament);
     }
@@ -87,8 +100,10 @@ public class TournamentService {
         tournamentDTO.setPrize(tournament.getPrize());
         tournamentDTO.setScore(tournament.getScore());
         tournamentDTO.setPoints(tournament.getPoints());
-        tournamentDTO.setEvent(tournament.getEvent() == null ? null : tournament.getEvent().getId());
-        tournamentDTO.setPlayer(tournament.getPlayer() == null ? null : tournament.getPlayer().getId());
+        tournamentDTO.setEvent(
+                tournament.getEvent() == null ? null : tournament.getEvent().getId());
+        tournamentDTO.setPlayer(
+                tournament.getPlayer() == null ? null : tournament.getPlayer().getId());
         return tournamentDTO;
     }
 
@@ -99,11 +114,19 @@ public class TournamentService {
         tournament.setPrize(tournamentDTO.getPrize());
         tournament.setScore(tournamentDTO.getScore());
         tournament.setPoints(tournamentDTO.getPoints());
-        final Event event = tournamentDTO.getEvent() == null ? null : eventRepository.findById(tournamentDTO.getEvent())
-                .orElseThrow(() -> new NotFoundException("event not found"));
+        final Event event =
+                tournamentDTO.getEvent() == null
+                        ? null
+                        : eventRepository
+                                .findById(tournamentDTO.getEvent())
+                                .orElseThrow(() -> new NotFoundException("event not found"));
         tournament.setEvent(event);
-        final Player player = tournamentDTO.getPlayer() == null ? null : playerRepository.findById(tournamentDTO.getPlayer())
-                .orElseThrow(() -> new NotFoundException("player not found"));
+        final Player player =
+                tournamentDTO.getPlayer() == null
+                        ? null
+                        : playerRepository
+                                .findById(tournamentDTO.getPlayer())
+                                .orElseThrow(() -> new NotFoundException("player not found"));
         tournament.setPlayer(player);
         return tournament;
     }
@@ -129,5 +152,4 @@ public class TournamentService {
             throw referencedException;
         }
     }
-
 }

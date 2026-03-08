@@ -3,16 +3,17 @@ package dg.swiss.swiss_dg_db.tournament;
 import dg.swiss.swiss_dg_db.event.Event;
 import dg.swiss.swiss_dg_db.player.Player;
 import dg.swiss.swiss_dg_db.round.Round;
+
 import jakarta.persistence.*;
 
-import java.util.HashSet;
-import java.util.Set;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
 @Table(name = "Tournaments")
@@ -25,10 +26,7 @@ public class Tournament {
 
     @Id
     @Column(nullable = false, updatable = false)
-    @GeneratedValue(
-            strategy = GenerationType.SEQUENCE,
-            generator = "primary_sequence"
-    )
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "primary_sequence")
     private Long id;
 
     @Column(nullable = false)
@@ -37,17 +35,13 @@ public class Tournament {
     @Column(nullable = false)
     private Integer place;
 
-    @Column
-    private Integer rating;
+    @Column private Integer rating;
 
-    @Column
-    private Double prize;
+    @Column private Double prize;
 
-    @Column
-    private Integer score;
+    @Column private Integer score;
 
-    @Column
-    private Double points;
+    @Column private Double points;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "event_id", nullable = false)
@@ -60,5 +54,4 @@ public class Tournament {
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "player_id", nullable = false)
     private Player player;
-
 }

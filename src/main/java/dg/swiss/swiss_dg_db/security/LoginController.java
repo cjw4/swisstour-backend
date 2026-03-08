@@ -2,7 +2,9 @@ package dg.swiss.swiss_dg_db.security;
 
 import dg.swiss.swiss_dg_db.security.jwt.JwtUtil;
 import dg.swiss.swiss_dg_db.user.CustomUser;
+
 import io.swagger.v3.oas.annotations.tags.Tag;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.*;
@@ -23,7 +25,6 @@ public class LoginController {
         this.authenticationManager = authenticationManager;
     }
 
-
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody CustomUser user) {
         try {
@@ -31,10 +32,7 @@ public class LoginController {
             System.out.println("Login attempt for user:" + user.getUsername());
 
             UsernamePasswordAuthenticationToken authenticationToken =
-                    new UsernamePasswordAuthenticationToken(
-                            user.getUsername(),
-                            user.getPassword()
-                    );
+                    new UsernamePasswordAuthenticationToken(user.getUsername(), user.getPassword());
 
             Authentication authentication = authenticationManager.authenticate(authenticationToken);
 
@@ -55,14 +53,12 @@ public class LoginController {
         } catch (DisabledException e) {
             // Handling for disabled user account
             System.out.println("Account disabled for user: " + user.getUsername());
-            return ResponseEntity.status(HttpStatus.FORBIDDEN)
-                    .body("Account is disabled");
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Account is disabled");
 
         } catch (LockedException e) {
             // Handling for locked user account
             System.out.println("Account locked for user: " + user.getUsername());
-            return ResponseEntity.status(HttpStatus.FORBIDDEN)
-                    .body("Account is locked");
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Account is locked");
 
         } catch (Exception e) {
             // Generic error handling for any other authentication failures

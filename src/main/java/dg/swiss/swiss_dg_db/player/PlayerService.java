@@ -6,18 +6,17 @@ import dg.swiss.swiss_dg_db.events.BeforeDeletePlayer;
 import dg.swiss.swiss_dg_db.round.RoundDTOsmall;
 import dg.swiss.swiss_dg_db.scrape.NameConverter;
 import dg.swiss.swiss_dg_db.scrape.PlayerDetails;
-import dg.swiss.swiss_dg_db.tournament.Tournament;
 import dg.swiss.swiss_dg_db.tournament.TournamentRepository;
 import dg.swiss.swiss_dg_db.util.NotFoundException;
 
-import java.io.IOException;
-import java.util.List;
-
 import jakarta.transaction.Transactional;
+
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
+import java.util.List;
 
 @Service
 public class PlayerService {
@@ -27,9 +26,10 @@ public class PlayerService {
     private final PlayerDetails playerDetails;
     private final TournamentRepository tournamentRepository;
 
-    public PlayerService(final PlayerRepository playerRepository,
-                         final ApplicationEventPublisher publisher,
-                         final TournamentRepository tournamentRepository) {
+    public PlayerService(
+            final PlayerRepository playerRepository,
+            final ApplicationEventPublisher publisher,
+            final TournamentRepository tournamentRepository) {
         this.playerRepository = playerRepository;
         this.publisher = publisher;
         this.playerDetails = new PlayerDetails();
@@ -38,13 +38,12 @@ public class PlayerService {
 
     public List<PlayerDTO> findAll() {
         final List<Player> players = playerRepository.findAll(Sort.by("id"));
-        return players.stream()
-                .map(player -> mapToDTO(player, new PlayerDTO()))
-                .toList();
+        return players.stream().map(player -> mapToDTO(player, new PlayerDTO())).toList();
     }
 
     public PlayerDTO get(final Long id) {
-        return playerRepository.findById(id)
+        return playerRepository
+                .findById(id)
                 .map(player -> mapToDTO(player, new PlayerDTO()))
                 .orElseThrow(NotFoundException::new);
     }
@@ -68,16 +67,14 @@ public class PlayerService {
     }
 
     public void update(final Long id, final PlayerDTO playerDTO) {
-        final Player player = playerRepository.findById(id)
-                .orElseThrow(NotFoundException::new);
+        final Player player = playerRepository.findById(id).orElseThrow(NotFoundException::new);
         mapToEntity(playerDTO, player);
         playerRepository.save(player);
     }
 
     @Transactional
     public void delete(final Long id) {
-        final Player player = playerRepository.findById(id)
-                .orElseThrow(NotFoundException::new);
+        final Player player = playerRepository.findById(id).orElseThrow(NotFoundException::new);
 
         // Explicitly clear relationships
         player.getTournaments().clear();
@@ -125,43 +122,71 @@ public class PlayerService {
             return false;
         }
         NameConverter.NameInfo nameInfo = NameConverter.splitName(names);
-        return playerRepository.existsByFirstnameAndLastname(nameInfo.getFirstName(), nameInfo.getLastName());
+        return playerRepository.existsByFirstnameAndLastname(
+                nameInfo.getFirstName(), nameInfo.getLastName());
     }
 
     public PlayerDTO findByPdgaNumber(Long pdgaNumber) {
-        Player player = playerRepository.findByPdgaNumber(pdgaNumber)
-                .orElseThrow(() -> new NotFoundException("Player not found"));
+        Player player =
+                playerRepository
+                        .findByPdgaNumber(pdgaNumber)
+                        .orElseThrow(() -> new NotFoundException("Player not found"));
         return mapToDTO(player, new PlayerDTO());
     }
 
     public PlayerDTO findByName(String fullName) {
         String[] names = fullName.trim().split("\\s+");
         NameConverter.NameInfo nameInfo = NameConverter.splitName(names);
-        Player player = playerRepository.findByFirstnameAndLastname(nameInfo.getFirstName(), nameInfo.getLastName())
-                .orElseThrow(() -> new NotFoundException("Player not found"));
+        Player player =
+                playerRepository
+                        .findByFirstnameAndLastname(nameInfo.getFirstName(), nameInfo.getLastName())
+                        .orElseThrow(() -> new NotFoundException("Player not found"));
         return mapToDTO(player, new PlayerDTO());
     }
 
     public List<PlayerEventsDTO> getPlayerEvents(final Long id) {
-        return tournamentRepository.findTournamentsWithEventAndRoundsByPlayerId(id)
-                .stream()
-                .map(t -> {
-                    Event e = t.getEvent();
-                    List<RoundDTOsmall> rounds = t.getRounds().stream()
-                            .map(r -> new RoundDTOsmall(r.getRoundNumber(), r.getRating(), r.getScore()))
-                            .toList();
-                    return new PlayerEventsDTO(
-                            e.getId(), e.getEventId(), e.getName(), e.getDisplayName(),
-                            e.getTier(), e.getYear(), e.getCity(), e.getCountry(),
-                            e.getNumberPlayers(), e.getPoints(), e.getPurse(),
-                            e.getIsChampionship(), e.getIsSwisstour(), e.getHasResults(),
-                            e.getInfoLink(), e.getRegistrationLink(), e.getRegistrationStart(),
-                            e.getSwisstourType(), e.getStartDate(), e.getEndDate(),
-                            t.getDivision(), t.getPlace(), t.getRating(),
-                            t.getPrize(), t.getScore(), t.getPoints(),
-                            rounds
-                    );
-                })
+        return tournamentRepository.findTournamentsWithEventAndRoundsByPlayerId(id).stream()
+                .map(
+                        t -> {
+                            Event e = t.getEvent();
+                            List<RoundDTOsmall> rounds =
+                                    t.getRounds().stream()
+                                            .map(
+                                                    r ->
+                                                            new RoundDTOsmall(
+                                                                    r.getRoundNumber(),
+                                                                    r.getRating(),
+                                                                    r.getScore()))
+                                            .toList();
+                            return new PlayerEventsDTO(
+                                    e.getId(),
+                                    e.getEventId(),
+                                    e.getName(),
+                                    e.getDisplayName(),
+                                    e.getTier(),
+                                    e.getYear(),
+                                    e.getCity(),
+                                    e.getCountry(),
+                                    e.getNumberPlayers(),
+                                    e.getPoints(),
+                                    e.getPurse(),
+                                    e.getIsChampionship(),
+                                    e.getIsSwisstour(),
+                                    e.getHasResults(),
+                                    e.getInfoLink(),
+                                    e.getRegistrationLink(),
+                                    e.getRegistrationStart(),
+                                    e.getSwisstourType(),
+                                    e.getStartDate(),
+                                    e.getEndDate(),
+                                    t.getDivision(),
+                                    t.getPlace(),
+                                    t.getRating(),
+                                    t.getPrize(),
+                                    t.getScore(),
+                                    t.getPoints(),
+                                    rounds);
+                        })
                 .toList();
     }
 }

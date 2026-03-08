@@ -1,6 +1,7 @@
 package dg.swiss.swiss_dg_db.round;
 
 import jakarta.validation.constraints.NotNull;
+
 import lombok.Getter;
 import lombok.Setter;
 
@@ -16,7 +17,5 @@ public class RoundDTO {
 
     private Integer rating;
 
-    @NotNull
-    private Long tournament;
-
+    @NotNull private Long tournament;
 }

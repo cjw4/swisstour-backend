@@ -1,6 +1,7 @@
 package dg.swiss.swiss_dg_db.standings;
 
 import io.swagger.v3.oas.annotations.tags.Tag;
+
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -19,8 +20,9 @@ public class StandingsResource {
     }
 
     @GetMapping("/{year}/{division}")
-    public ResponseEntity<List<StandingDTO>> getStandings(@PathVariable(name = "division") final String division,
-                                                          @PathVariable(name = "year") final Integer year) {
+    public ResponseEntity<List<StandingDTO>> getStandings(
+            @PathVariable(name = "division") final String division,
+            @PathVariable(name = "year") final Integer year) {
         return ResponseEntity.ok(standingService.getStandings(division, year));
     }
 }

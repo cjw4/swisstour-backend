@@ -1,11 +1,12 @@
 package dg.swiss.swiss_dg_db.scrape;
 
+import static org.junit.jupiter.api.Assertions.*;
+
 import dg.swiss.swiss_dg_db.scrape.DateConverter.DateInfo;
+
 import org.junit.jupiter.api.Test;
 
 import java.time.LocalDate;
-
-import static org.junit.jupiter.api.Assertions.*;
 
 public class DateConverterTest {
 
@@ -30,4 +31,3 @@ public class DateConverterTest {
         assertEquals(4, info3.getDays());
     }
 }
-
