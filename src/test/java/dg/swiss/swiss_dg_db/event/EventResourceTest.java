@@ -1,7 +1,11 @@
 package dg.swiss.swiss_dg_db.event;
 
+import static org.mockito.Mockito.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
-import lombok.RequiredArgsConstructor;
+import dg.swiss.swiss_dg_db.util.NotFoundException;
+import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -16,42 +20,31 @@ import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
-import dg.swiss.swiss_dg_db.util.NotFoundException;
-
-import java.util.List;
-
-import static org.mockito.Mockito.*;
-
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-
 @WebMvcTest(controllers = EventResource.class)
 @AutoConfigureMockMvc(addFilters = false)
 @DisplayName("EventResource Unit Tests")
 class EventResourceTest {
 
-    @Autowired
-    private MockMvc mockMvc;
+    @Autowired private MockMvc mockMvc;
 
-    @MockitoBean
-    private EventService eventService;
+    @MockitoBean private EventService eventService;
 
-    @MockitoBean
-    private EventRepository eventRepository;
+    @MockitoBean private EventRepository eventRepository;
 
-    @Autowired
-    private ObjectMapper objectMapper;
+    @Autowired private ObjectMapper objectMapper;
 
     private EventDTO eventDTO;
 
     @BeforeEach
     void setUp() {
-        eventDTO = EventDTO.builder()
-                .id(1L)
-                .eventId(1L)
-                .points(100)
-                .isChampionship(false)
-                .isSwisstour(true)
-                .build();
+        eventDTO =
+                EventDTO.builder()
+                        .id(1L)
+                        .eventId(1L)
+                        .points(100)
+                        .isChampionship(false)
+                        .isSwisstour(true)
+                        .build();
     }
 
     @Nested
@@ -65,8 +58,9 @@ class EventResourceTest {
                     .thenReturn(List.of(eventDTO));
 
             // Act
-            ResultActions response = mockMvc.perform(MockMvcRequestBuilders.get("/api/events")
-                    .param("year", "2025"));
+            ResultActions response =
+                    mockMvc.perform(
+                            MockMvcRequestBuilders.get("/api/events").param("year", "2025"));
 
             // Assert
             response.andExpect(MockMvcResultMatchers.status().isOk());
@@ -81,8 +75,7 @@ class EventResourceTest {
         @DisplayName("test successful response")
         void EventResource_getEventSuccess_Returns200() throws Exception {
             // Arrange
-            when(eventService.getEvent(eventDTO.getId()))
-                    .thenReturn(eventDTO);
+            when(eventService.getEvent(eventDTO.getId())).thenReturn(eventDTO);
 
             // Act
             ResultActions response = mockMvc.perform(MockMvcRequestBuilders.get("/api/events/1"));
@@ -96,8 +89,7 @@ class EventResourceTest {
         @DisplayName("test event not found")
         void EventResource_getEventNotFound_Returns404() throws Exception {
             // Arrange
-            when(eventService.getEvent(eventDTO.getId()))
-                    .thenThrow(new NotFoundException());
+            when(eventService.getEvent(eventDTO.getId())).thenThrow(new NotFoundException());
 
             // Act
             ResultActions response = mockMvc.perform(MockMvcRequestBuilders.get("/api/events/1"));
@@ -115,17 +107,16 @@ class EventResourceTest {
         @DisplayName("test successful creation")
         void EventResource_createSuccess_ReturnEventDTO() throws Exception {
             // Arrange
-            when(eventRepository.existsByEventId(eventDTO.getEventId()))
-                    .thenReturn(false);
-            when(eventService.addDetails(eventDTO))
-                    .thenReturn(eventDTO);
-            when(eventService.create(eventDTO))
-                    .thenReturn(eventDTO);
+            when(eventRepository.existsByEventId(eventDTO.getEventId())).thenReturn(false);
+            when(eventService.addDetails(eventDTO)).thenReturn(eventDTO);
+            when(eventService.create(eventDTO)).thenReturn(eventDTO);
 
             // Act
-            ResultActions response = mockMvc.perform(post("/api/events")
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content(objectMapper.writeValueAsString(eventDTO)));
+            ResultActions response =
+                    mockMvc.perform(
+                            post("/api/events")
+                                    .contentType(MediaType.APPLICATION_JSON)
+                                    .content(objectMapper.writeValueAsString(eventDTO)));
 
             // Assert
             response.andExpect(MockMvcResultMatchers.status().isCreated());
@@ -138,13 +129,14 @@ class EventResourceTest {
         @DisplayName("test creation with duplicate eventId")
         void EventResource_createDuplicateEventId_ReturnConflict() throws Exception {
             // Arrange
-            when(eventRepository.existsByEventId(eventDTO.getEventId()))
-                    .thenReturn(true);
+            when(eventRepository.existsByEventId(eventDTO.getEventId())).thenReturn(true);
 
             // Act
-            ResultActions response = mockMvc.perform(post("/api/events")
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content(objectMapper.writeValueAsString(eventDTO)));
+            ResultActions response =
+                    mockMvc.perform(
+                            post("/api/events")
+                                    .contentType(MediaType.APPLICATION_JSON)
+                                    .content(objectMapper.writeValueAsString(eventDTO)));
 
             // Assert
             response.andExpect(MockMvcResultMatchers.status().isConflict());

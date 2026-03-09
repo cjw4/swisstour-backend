@@ -6,7 +6,6 @@ import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.Setter;
 
-
 @Getter
 @Setter
 public class PlayerDTO {
@@ -19,16 +18,12 @@ public class PlayerDTO {
     @Size(max = 255)
     private String lastname;
 
-    @PlayerPdgaNumberUnique
-    private Long pdgaNumber;
+    @PlayerPdgaNumberUnique private Long pdgaNumber;
 
-    @PlayerSdaNumberUnique
-    private Long sdaNumber;
+    @PlayerSdaNumberUnique private Long sdaNumber;
 
-    @NotNull
-    private Boolean swisstourLicense;
+    @NotNull private Boolean swisstourLicense;
 
     @JsonProperty("isPro")
     private Boolean isPro;
-
 }

@@ -1,6 +1,14 @@
 package dg.swiss.swiss_dg_db.scrape;
 
 import dg.swiss.swiss_dg_db.exceptions.EventDoesNotExistException;
+import java.io.IOException;
+import java.time.LocalDate;
+import java.time.format.DateTimeParseException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
@@ -10,16 +18,6 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import org.springframework.stereotype.Component;
-
-import java.io.IOException;
-import java.sql.SQLOutput;
-import java.time.LocalDate;
-import java.time.format.DateTimeParseException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
 
 @Component
 @Setter
@@ -198,7 +196,7 @@ public class EventDetails {
                 pts = splitPointsForTies(pts, tournamentDetails);
 
                 // Loop through the TournamentDetails and assign points
-                for ( TournamentDetail tournamentDetail : tournamentDetails) {
+                for (TournamentDetail tournamentDetail : tournamentDetails) {
                     if (tournamentDetail != null) {
                         if (tournamentDetail.score != null) {
                             tournamentDetail.setPoints(pts.get(tournamentDetail.getPlace()));
@@ -216,9 +214,10 @@ public class EventDetails {
     private static HashMap<Integer, Double> createPtsDict(double scale, Integer noPlayers) {
         HashMap<Integer, Double> pointsMap = new HashMap<>();
         // Base points defined within this method
-        int[] basePoints = {100, 90, 81, 73, 66, 60, 55, 50, 46, 42,
-                38, 35, 32, 29, 26, 23, 21, 19,
-                17, 15, 13, 11, 10, 9, 8, 7, 6, 5};
+        int[] basePoints = {
+            100, 90, 81, 73, 66, 60, 55, 50, 46, 42, 38, 35, 32, 29, 26, 23, 21, 19, 17, 15, 13, 11,
+            10, 9, 8, 7, 6, 5
+        };
         for (int i = 0; i < basePoints.length; i++) {
             // Multiply by scale factor based on input
             pointsMap.put(i + 1, basePoints[i] * (scale / 100));
@@ -232,29 +231,35 @@ public class EventDetails {
         return pointsMap;
     }
 
-    private static HashMap<Integer, Double> splitPointsForTies(HashMap<Integer, Double> originalPts, List<TournamentDetail> tournamentDetails) {
+    private static HashMap<Integer, Double> splitPointsForTies(
+            HashMap<Integer, Double> originalPts, List<TournamentDetail> tournamentDetails) {
         // Create a map to track the count of participants for each place
-        Map<Integer, Long> placeCountMap = tournamentDetails.stream()
-                .filter(detail -> detail.getPlace() != null)
-                .collect(Collectors.groupingBy(TournamentDetail::getPlace, Collectors.counting()));
+        Map<Integer, Long> placeCountMap =
+                tournamentDetails.stream()
+                        .filter(detail -> detail.getPlace() != null)
+                        .collect(
+                                Collectors.groupingBy(
+                                        TournamentDetail::getPlace, Collectors.counting()));
 
         // Create a new points map to store adjusted points
         HashMap<Integer, Double> adjustedPts = new HashMap<>(originalPts);
 
         // Iterate through places with ties
-        placeCountMap.forEach((place, count) -> {
-            if (count > 1) {
-                // Calculate average points for tied positions
-                double avgPoints = calculateAveragePointsForTiedPlace(originalPts, place, count);
-                adjustedPts.put(place, avgPoints);
-            }
-        });
+        placeCountMap.forEach(
+                (place, count) -> {
+                    if (count > 1) {
+                        // Calculate average points for tied positions
+                        double avgPoints =
+                                calculateAveragePointsForTiedPlace(originalPts, place, count);
+                        adjustedPts.put(place, avgPoints);
+                    }
+                });
 
         return adjustedPts;
     }
 
-
-    private static double calculateAveragePointsForTiedPlace(HashMap<Integer, Double> originalPts, int tiedPlace, long tiedCount) {
+    private static double calculateAveragePointsForTiedPlace(
+            HashMap<Integer, Double> originalPts, int tiedPlace, long tiedCount) {
         // Collect points for the consecutive places that will be averaged
         List<Double> pointsToAverage = new ArrayList<>();
 
@@ -267,10 +272,7 @@ public class EventDetails {
         }
 
         // Calculate the average of these points
-        return pointsToAverage.stream()
-                .mapToDouble(Double::doubleValue)
-                .average()
-                .orElse(0.0);
+        return pointsToAverage.stream().mapToDouble(Double::doubleValue).average().orElse(0.0);
     }
 
     private static TournamentDetail parseTournament(Element tournament, String division) {
@@ -327,17 +329,20 @@ public class EventDetails {
                     if (!scoreText.isEmpty()) {
                         roundScore = Integer.parseInt(scoreText);
                     }
-                } catch (Exception ignored) {}
+                } catch (Exception ignored) {
+                }
                 try {
                     String ratingText = roundRatings.get(i).text().trim();
                     if (!ratingText.isEmpty()) {
                         roundRating = Integer.parseInt(ratingText);
                     }
-                } catch (Exception ignored) {}
-                rounds.add(new RoundDetail(i+1, roundScore, roundRating));
+                } catch (Exception ignored) {
+                }
+                rounds.add(new RoundDetail(i + 1, roundScore, roundRating));
             }
 
-            return new TournamentDetail(name, pdgaNumber, division, score, place, prize, null,rounds);
+            return new TournamentDetail(
+                    name, pdgaNumber, division, score, place, prize, null, rounds);
         } catch (Exception e) {
             return null;
         }

@@ -1,8 +1,7 @@
 package dg.swiss.swiss_dg_db.scrape;
 
-import lombok.Getter;
-
 import java.util.Arrays;
+import lombok.Getter;
 
 public class NameConverter {
 
@@ -22,5 +21,4 @@ public class NameConverter {
         String lastName = names[names.length - 1];
         return new NameInfo(firstName, lastName);
     }
-
 }

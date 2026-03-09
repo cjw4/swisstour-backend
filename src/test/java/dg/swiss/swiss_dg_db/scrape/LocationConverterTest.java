@@ -1,9 +1,9 @@
 package dg.swiss.swiss_dg_db.scrape;
 
+import static org.junit.jupiter.api.Assertions.*;
+
 import dg.swiss.swiss_dg_db.scrape.LocationConverter.LocationInfo;
 import org.junit.jupiter.api.Test;
-
-import static org.junit.jupiter.api.Assertions.*;
 
 class LocationConverterTest {
 

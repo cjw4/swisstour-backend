@@ -5,7 +5,6 @@ import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.Setter;
 
-
 @Getter
 @Setter
 public class TournamentDTO {
@@ -16,8 +15,7 @@ public class TournamentDTO {
     @Size(max = 255)
     private String division;
 
-    @NotNull
-    private Integer place;
+    @NotNull private Integer place;
 
     private Integer rating;
 
@@ -27,10 +25,7 @@ public class TournamentDTO {
 
     private Double points;
 
-    @NotNull
-    private Long event;
+    @NotNull private Long event;
 
-    @NotNull
-    private Long player;
-
+    @NotNull private Long player;
 }

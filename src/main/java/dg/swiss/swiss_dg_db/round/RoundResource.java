@@ -10,7 +10,8 @@ public class RoundResource {
     private final TournamentRepository tournamentRepository;
     private final RoundRepository roundRepository;
 
-    public RoundResource(TournamentRepository tournamentRepository, RoundRepository roundRepository) {
+    public RoundResource(
+            TournamentRepository tournamentRepository, RoundRepository roundRepository) {
         this.tournamentRepository = tournamentRepository;
         this.roundRepository = roundRepository;
     }
@@ -26,8 +27,12 @@ public class RoundResource {
         round.setRoundNumber(roundDTO.getRoundNumber());
         round.setScore(roundDTO.getScore());
         round.setRating(roundDTO.getRating());
-        final Tournament tournament = roundDTO.getTournament() == null ? null : tournamentRepository
-                .findById(roundDTO.getTournament()).orElseThrow(() -> new NotFoundException("Tournament not found"));
+        final Tournament tournament =
+                roundDTO.getTournament() == null
+                        ? null
+                        : tournamentRepository
+                                .findById(roundDTO.getTournament())
+                                .orElseThrow(() -> new NotFoundException("Tournament not found"));
         round.setTournament(tournament);
         return round;
     }

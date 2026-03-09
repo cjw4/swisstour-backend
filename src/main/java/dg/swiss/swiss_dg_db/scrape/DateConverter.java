@@ -1,10 +1,9 @@
 package dg.swiss.swiss_dg_db.scrape;
 
-import lombok.Getter;
-
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
+import lombok.Getter;
 
 public class DateConverter {
 
@@ -22,12 +21,14 @@ public class DateConverter {
     }
 
     public static DateInfo convertDate(String date) {
-        DateTimeFormatter formatterWithYear = DateTimeFormatter.ofPattern("dd-MMM-yyyy", java.util.Locale.ENGLISH);
+        DateTimeFormatter formatterWithYear =
+                DateTimeFormatter.ofPattern("dd-MMM-yyyy", java.util.Locale.ENGLISH);
 
         if (date.contains(" to ")) {
             String[] parts = date.split(" to ");
             LocalDate endDate = LocalDate.parse(parts[1], formatterWithYear);
-            LocalDate startDate = LocalDate.parse(parts[0] + "-" + endDate.getYear(), formatterWithYear);
+            LocalDate startDate =
+                    LocalDate.parse(parts[0] + "-" + endDate.getYear(), formatterWithYear);
             int days = (int) (ChronoUnit.DAYS.between(startDate, endDate) + 1);
             return new DateInfo(startDate, endDate, days);
         } else {
@@ -36,4 +37,3 @@ public class DateConverter {
         }
     }
 }
-

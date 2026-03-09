@@ -7,7 +7,6 @@ import lombok.Setter;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
-
 @ResponseStatus(HttpStatus.CONFLICT)
 @Getter
 @Setter
@@ -24,11 +23,8 @@ public class ReferencedException extends RuntimeException {
     public String getMessage() {
         String message = key;
         if (!params.isEmpty()) {
-            message += "," + params.stream()
-                    .map(Object::toString)
-                    .collect(Collectors.joining(","));
+            message += "," + params.stream().map(Object::toString).collect(Collectors.joining(","));
         }
         return message;
     }
-
 }

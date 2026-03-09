@@ -2,12 +2,9 @@ package dg.swiss.swiss_dg_db.player;
 
 import dg.swiss.swiss_dg_db.tournament.Tournament;
 import jakarta.persistence.*;
-
 import java.util.HashSet;
 import java.util.Set;
-
 import lombok.*;
-
 
 @Entity
 @Table(name = "Players")
@@ -23,12 +20,8 @@ public class Player {
     @SequenceGenerator(
             name = "primary_sequence",
             sequenceName = "primary_sequence",
-            allocationSize = 1
-    )
-    @GeneratedValue(
-            strategy = GenerationType.SEQUENCE,
-            generator = "primary_sequence"
-    )
+            allocationSize = 1)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "primary_sequence")
     private Long id;
 
     @Column(nullable = false)

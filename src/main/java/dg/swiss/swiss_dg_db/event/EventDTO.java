@@ -4,9 +4,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import java.time.LocalDate;
-
 import lombok.*;
-
 
 @Getter
 @Setter
@@ -39,8 +37,7 @@ public class EventDTO {
 
     private Integer numberPlayers;
 
-    @NotNull
-    private Integer points;
+    @NotNull private Integer points;
 
     private Double purse;
 
@@ -69,5 +66,4 @@ public class EventDTO {
     private LocalDate startDate;
 
     private LocalDate endDate;
-
 }

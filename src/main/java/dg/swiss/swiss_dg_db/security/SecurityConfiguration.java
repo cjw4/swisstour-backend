@@ -1,7 +1,8 @@
 package dg.swiss.swiss_dg_db.security;
 
-import dg.swiss.swiss_dg_db.config.WebConfig;
 import dg.swiss.swiss_dg_db.security.jwt.JwtAuthenticationFilter;
+import java.util.Arrays;
+import java.util.List;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -17,9 +18,6 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
-
-import java.util.Arrays;
-import java.util.List;
 
 @Configuration
 public class SecurityConfiguration {
@@ -45,25 +43,37 @@ public class SecurityConfiguration {
         return httpSecurity
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .csrf(AbstractHttpConfigurer::disable)
-                .authorizeHttpRequests(authorize -> {
-                    authorize.requestMatchers(
-                            "/login",
-                            "/v3/api-docs",
-                            "/v3/api-docs/**",
-                            "/swagger-ui.html"
-                    ).permitAll();
-                    authorize.requestMatchers(HttpMethod.PUT, "/api/events/{id}").authenticated();
-                    authorize.requestMatchers(HttpMethod.POST, "/api/events/results/{id}").authenticated();
-                    authorize.requestMatchers(HttpMethod.DELETE, "/api/events/{id}").authenticated();
-                    authorize.requestMatchers(HttpMethod.POST, "/api/players").authenticated();
-                    authorize.requestMatchers(HttpMethod.PUT, "/api/players/{id}").authenticated();
-                    authorize.requestMatchers(HttpMethod.DELETE, "/api/players/{id}").authenticated();
-                    authorize.anyRequest().permitAll();
-                })
+                .authorizeHttpRequests(
+                        authorize -> {
+                            authorize
+                                    .requestMatchers(
+                                            "/login",
+                                            "/v3/api-docs",
+                                            "/v3/api-docs/**",
+                                            "/swagger-ui.html")
+                                    .permitAll();
+                            authorize
+                                    .requestMatchers(HttpMethod.PUT, "/api/events/{id}")
+                                    .authenticated();
+                            authorize
+                                    .requestMatchers(HttpMethod.POST, "/api/events/results/{id}")
+                                    .authenticated();
+                            authorize
+                                    .requestMatchers(HttpMethod.DELETE, "/api/events/{id}")
+                                    .authenticated();
+                            authorize
+                                    .requestMatchers(HttpMethod.POST, "/api/players")
+                                    .authenticated();
+                            authorize
+                                    .requestMatchers(HttpMethod.PUT, "/api/players/{id}")
+                                    .authenticated();
+                            authorize
+                                    .requestMatchers(HttpMethod.DELETE, "/api/players/{id}")
+                                    .authenticated();
+                            authorize.anyRequest().permitAll();
+                        })
                 .addFilterBefore(
-                        jwtAuthenticationFilter(),
-                        UsernamePasswordAuthenticationFilter.class
-                )
+                        jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class)
                 .build();
     }
 

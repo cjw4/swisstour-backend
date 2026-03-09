@@ -3,7 +3,6 @@ package dg.swiss.swiss_dg_db;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-
 @RestController
 public class HomeResource {
 
@@ -11,5 +10,4 @@ public class HomeResource {
     public String index() {
         return "\"Hello World!\"";
     }
-
 }

@@ -1,12 +1,11 @@
 package dg.swiss.swiss_dg_db.event;
 
 import dg.swiss.swiss_dg_db.round.RoundDTOsmall;
+import java.time.LocalDate;
+import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
-
-import java.time.LocalDate;
-import java.util.List;
 
 @AllArgsConstructor
 @Getter

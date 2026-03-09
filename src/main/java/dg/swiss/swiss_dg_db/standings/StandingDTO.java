@@ -1,10 +1,9 @@
 package dg.swiss.swiss_dg_db.standings;
 
+import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
-
-import java.util.List;
 
 @AllArgsConstructor
 @Getter

@@ -16,7 +16,5 @@ public class RoundDTO {
 
     private Integer rating;
 
-    @NotNull
-    private Long tournament;
-
+    @NotNull private Long tournament;
 }

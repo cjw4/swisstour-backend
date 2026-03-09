@@ -4,25 +4,22 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
-import org.springframework.security.core.userdetails.User;
-
-import javax.crypto.SecretKey;
 import java.util.Date;
+import javax.crypto.SecretKey;
+import org.springframework.security.core.userdetails.User;
 
 public class JwtUtil {
 
     public static String generateToken(User user) {
-        return Jwts
-                .builder()
+        return Jwts.builder()
                 .subject(user.getUsername())
-                .expiration(new Date(System.currentTimeMillis() + 86_400_000L))//24hr
+                .expiration(new Date(System.currentTimeMillis() + 86_400_000L)) // 24hr
                 .signWith(getSigningKey())
                 .compact();
     }
 
     public static Claims getClaims(String token) {
-        return Jwts
-                .parser()
+        return Jwts.parser()
                 .verifyWith(getSigningKey())
                 .build()
                 .parseSignedClaims(token)
@@ -38,7 +35,8 @@ public class JwtUtil {
     }
 
     private static SecretKey getSigningKey() {
-        byte[] keyBytes = Decoders.BASE64.decode("swissTourSecretKeyChristopherWalker2027SwissChampion");
+        byte[] keyBytes =
+                Decoders.BASE64.decode("swissTourSecretKeyChristopherWalker2027SwissChampion");
         return Keys.hmacShaKeyFor(keyBytes);
     }
 }

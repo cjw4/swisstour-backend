@@ -1,12 +1,10 @@
 package dg.swiss.swiss_dg_db.player;
 
-import dg.swiss.swiss_dg_db.event.EventDTO;
 import dg.swiss.swiss_dg_db.event.PlayerEventsDTO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
-
 import java.io.IOException;
 import java.util.List;
 import org.springframework.http.HttpStatus;
@@ -31,24 +29,24 @@ public class PlayerResource {
         return ResponseEntity.ok(playerService.findAll());
     }
 
-    @Operation(
-            description = "Get player by id"
-    )
+    @Operation(description = "Get player by id")
     @GetMapping("/{id}")
     public ResponseEntity<PlayerDTO> getPlayer(@PathVariable(name = "id") final Long id) {
         return ResponseEntity.ok(playerService.get(id));
     }
 
     @PostMapping
-    public ResponseEntity<Long> createPlayer(@RequestBody @Valid final PlayerDTO playerDTO) throws IOException {
+    public ResponseEntity<Long> createPlayer(@RequestBody @Valid final PlayerDTO playerDTO)
+            throws IOException {
         PlayerDTO playerDTOwDetails = playerService.addDetails(playerDTO);
         final Long createdId = playerService.create(playerDTOwDetails);
         return new ResponseEntity<>(createdId, HttpStatus.CREATED);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Long> updatePlayer(@PathVariable(name = "id") final Long id,
-            @RequestBody @Valid final PlayerDTO playerDTO) throws IOException {
+    public ResponseEntity<Long> updatePlayer(
+            @PathVariable(name = "id") final Long id, @RequestBody @Valid final PlayerDTO playerDTO)
+            throws IOException {
         PlayerDTO playerDTOwDetails = playerService.addDetails(playerDTO);
         playerService.update(id, playerDTOwDetails);
         return ResponseEntity.ok(id);
@@ -61,8 +59,8 @@ public class PlayerResource {
     }
 
     @GetMapping("/events/{id}")
-    public ResponseEntity<List<PlayerEventsDTO>> getPlayerEvents(@PathVariable(name = "id") final Long id) {
+    public ResponseEntity<List<PlayerEventsDTO>> getPlayerEvents(
+            @PathVariable(name = "id") final Long id) {
         return ResponseEntity.ok(playerService.getPlayerEvents(id));
     }
-
 }
