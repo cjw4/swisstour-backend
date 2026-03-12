@@ -65,6 +65,9 @@ public class SecurityConfiguration {
                                     .requestMatchers(HttpMethod.POST, "/api/players")
                                     .authenticated();
                             authorize
+                                    .requestMatchers(HttpMethod.POST, "/api/players/update")
+                                    .authenticated();
+                            authorize
                                     .requestMatchers(HttpMethod.PUT, "/api/players/{id}")
                                     .authenticated();
                             authorize
