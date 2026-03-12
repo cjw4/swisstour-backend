@@ -11,6 +11,9 @@ spring:
           new_generator_mappings: true
   profiles:
     active: dev
+app:
+  google-sheet:
+    csv-url: ${GOOGLE_SHEET_CSV_URL}
 ---
 spring:
   config:
