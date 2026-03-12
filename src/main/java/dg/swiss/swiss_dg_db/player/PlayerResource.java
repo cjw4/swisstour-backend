@@ -7,6 +7,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import java.io.IOException;
 import java.util.List;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -15,13 +16,10 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping(value = "/api/players", produces = MediaType.APPLICATION_JSON_VALUE)
 @Tag(name = "Players")
+@RequiredArgsConstructor
 public class PlayerResource {
 
     private final PlayerService playerService;
-
-    public PlayerResource(final PlayerService playerService) {
-        this.playerService = playerService;
-    }
 
     @GetMapping
     @SecurityRequirement(name = "bearerAuth")
@@ -62,5 +60,11 @@ public class PlayerResource {
     public ResponseEntity<List<PlayerEventsDTO>> getPlayerEvents(
             @PathVariable(name = "id") final Long id) {
         return ResponseEntity.ok(playerService.getPlayerEvents(id));
+    }
+
+    @PostMapping("/update")
+    public ResponseEntity<List<PlayerDTO>> addPlayersFromGoogleSheet()
+            throws IOException, InterruptedException {
+        return ResponseEntity.ok(playerService.addPlayersFromGoogleSheet());
     }
 }
