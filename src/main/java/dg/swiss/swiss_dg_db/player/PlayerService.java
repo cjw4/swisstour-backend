@@ -18,6 +18,7 @@ import java.net.URL;
 import java.util.*;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
@@ -30,8 +31,9 @@ public class PlayerService {
     private final ApplicationEventPublisher publisher;
     private final PlayerDetails playerDetails;
     private final TournamentRepository tournamentRepository;
-    private static final String CSV_EXPORT_URL =
-            "https://docs.google.com/spreadsheets/d/1oRw8G3JxLCsm8LjYfpfz8UXCcbRrk0zy/export?format=csv";
+
+    @Value("${app.google-sheet.csv-url}")
+    private String csvExportUrl;
 
     public List<PlayerDTO> findAll() {
         final List<Player> players = playerRepository.findAll(Sort.by("id"));
@@ -298,7 +300,7 @@ public class PlayerService {
 
     public List<PlayerDTO> readGoogleSheet() {
         try (BufferedReader reader =
-                new BufferedReader(new InputStreamReader(new URL(CSV_EXPORT_URL).openStream()))) {
+                new BufferedReader(new InputStreamReader(new URL(csvExportUrl).openStream()))) {
             return parseGoogleSheetCsv(reader);
         } catch (IOException e) {
             throw new RuntimeException(e);
