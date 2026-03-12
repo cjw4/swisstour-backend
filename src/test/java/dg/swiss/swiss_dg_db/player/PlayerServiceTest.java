@@ -1,9 +1,11 @@
 package dg.swiss.swiss_dg_db.player;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
+import dg.swiss.swiss_dg_db.player.exceptions.GoogleSheetUnavailableException;
 import dg.swiss.swiss_dg_db.scrape.PlayerDetails;
 import dg.swiss.swiss_dg_db.tournament.TournamentRepository;
 import java.io.BufferedReader;
@@ -17,6 +19,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.test.util.ReflectionTestUtils;
 
 @ExtendWith(MockitoExtension.class)
 class PlayerServiceTest {
@@ -34,6 +37,20 @@ class PlayerServiceTest {
                 spy(
                         new PlayerService(
                                 playerRepository, publisher, playerDetails, tournamentRepository));
+    }
+
+    // -------------------------------------------------------------------------
+    // readGoogleSheet
+    // -------------------------------------------------------------------------
+
+    @Test
+    void readGoogleSheet_inaccessibleUrl_throwsGoogleSheetUnavailableException() {
+        ReflectionTestUtils.setField(playerService, "csvExportUrl", "not-a-valid-url");
+
+        assertThatThrownBy(() -> playerService.readGoogleSheet())
+                .isInstanceOf(GoogleSheetUnavailableException.class)
+                .hasMessageContaining("not-a-valid-url")
+                .hasCauseInstanceOf(java.io.IOException.class);
     }
 
     // -------------------------------------------------------------------------

@@ -5,6 +5,7 @@ import static java.lang.Long.parseLong;
 import dg.swiss.swiss_dg_db.event.Event;
 import dg.swiss.swiss_dg_db.event.PlayerEventsDTO;
 import dg.swiss.swiss_dg_db.events.BeforeDeletePlayer;
+import dg.swiss.swiss_dg_db.player.exceptions.GoogleSheetUnavailableException;
 import dg.swiss.swiss_dg_db.round.RoundDTOsmall;
 import dg.swiss.swiss_dg_db.scrape.NameConverter;
 import dg.swiss.swiss_dg_db.scrape.PlayerDetails;
@@ -303,7 +304,8 @@ public class PlayerService {
                 new BufferedReader(new InputStreamReader(new URL(csvExportUrl).openStream()))) {
             return parseGoogleSheetCsv(reader);
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw new GoogleSheetUnavailableException(
+                    "Failed to fetch Google Sheet CSV from: " + csvExportUrl, e);
         }
     }
 
