@@ -297,48 +297,51 @@ public class PlayerService {
     }
 
     public List<PlayerDTO> readGoogleSheet() {
-        List<PlayerDTO> players = new ArrayList<>();
-
         try (BufferedReader reader =
                 new BufferedReader(new InputStreamReader(new URL(CSV_EXPORT_URL).openStream()))) {
-
-            reader.readLine(); // Skip header row (SDA, PDGA, Vorname, Name)
-
-            String line;
-            while ((line = reader.readLine()) != null) {
-
-                // Stop at first blank row
-                if (line.isBlank()) break;
-
-                String[] cols = line.split(",", -1);
-
-                if (cols.length < 4) {
-                    System.err.println("Skipping malformed row: " + line);
-                    continue;
-                }
-
-                try {
-                    Long sdaNumber = parseLong(cols[0].replaceAll("[^0-9]", ""));
-                    Long pdgaNumber = cols[1].isBlank() ? null : parseLong(cols[1]);
-                    String firstName = cols[3].trim();
-                    String lastName = cols[2].trim();
-
-                    players.add(
-                            PlayerDTO.builder()
-                                    .firstname(firstName)
-                                    .lastname(lastName)
-                                    .pdgaNumber(pdgaNumber)
-                                    .sdaNumber(sdaNumber)
-                                    .swisstourLicense(true)
-                                    .build());
-
-                } catch (Exception e) {
-                    System.err.println(
-                            "Skipping row due to parse error: " + line + " — " + e.getMessage());
-                }
-            }
+            return parseGoogleSheetCsv(reader);
         } catch (IOException e) {
             throw new RuntimeException(e);
+        }
+    }
+
+    List<PlayerDTO> parseGoogleSheetCsv(BufferedReader reader) throws IOException {
+        List<PlayerDTO> players = new ArrayList<>();
+
+        reader.readLine(); // Skip header row (SDA, PDGA, Nachname, Vorname)
+
+        String line;
+        while ((line = reader.readLine()) != null) {
+
+            // Stop at first blank row
+            if (line.isBlank()) break;
+
+            String[] cols = line.split(",", -1);
+
+            if (cols.length < 4) {
+                System.err.println("Skipping malformed row: " + line);
+                continue;
+            }
+
+            try {
+                Long sdaNumber = parseLong(cols[0].replaceAll("[^0-9]", ""));
+                Long pdgaNumber = cols[1].isBlank() ? null : parseLong(cols[1]);
+                String firstName = cols[3].trim();
+                String lastName = cols[2].trim();
+
+                players.add(
+                        PlayerDTO.builder()
+                                .firstname(firstName)
+                                .lastname(lastName)
+                                .pdgaNumber(pdgaNumber)
+                                .sdaNumber(sdaNumber)
+                                .swisstourLicense(true)
+                                .build());
+
+            } catch (Exception e) {
+                System.err.println(
+                        "Skipping row due to parse error: " + line + " — " + e.getMessage());
+            }
         }
 
         return players;
