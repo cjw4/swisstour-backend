@@ -193,7 +193,7 @@ public class EventDetails {
                 // Add points
                 HashMap<Integer, Double> pts = createPtsDict(points, tournaments.size());
                 // Split points for ties before assigning
-                pts = splitPointsForTies(pts, tournamentDetails);
+                // pts = splitPointsForTies(pts, tournamentDetails);
 
                 // Loop through the TournamentDetails and assign points
                 for (TournamentDetail tournamentDetail : tournamentDetails) {

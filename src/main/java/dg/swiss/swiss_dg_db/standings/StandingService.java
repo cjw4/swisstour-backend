@@ -4,15 +4,13 @@ import dg.swiss.swiss_dg_db.tournament.Tournament;
 import dg.swiss.swiss_dg_db.tournament.TournamentRepository;
 import java.util.*;
 import java.util.stream.Collectors;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 @Service
+@RequiredArgsConstructor
 public class StandingService {
     private final TournamentRepository tournamentRepository;
-
-    public StandingService(TournamentRepository tournamentRepository) {
-        this.tournamentRepository = tournamentRepository;
-    }
 
     public List<StandingDTO> getStandings(String division, Integer year) {
         List<Tournament> tournaments = tournamentRepository.findTournamentsByDivision(division);
