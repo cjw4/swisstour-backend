@@ -9,6 +9,7 @@ import dg.swiss.swiss_dg_db.player.exceptions.GoogleSheetUnavailableException;
 import dg.swiss.swiss_dg_db.round.RoundDTOsmall;
 import dg.swiss.swiss_dg_db.scrape.NameConverter;
 import dg.swiss.swiss_dg_db.scrape.PlayerDetails;
+import dg.swiss.swiss_dg_db.tournament.Tournament;
 import dg.swiss.swiss_dg_db.tournament.TournamentRepository;
 import dg.swiss.swiss_dg_db.util.NotFoundException;
 import jakarta.transaction.Transactional;
@@ -146,6 +147,14 @@ public class PlayerService {
 
     public List<PlayerEventsDTO> getPlayerEvents(final Long id) {
         return tournamentRepository.findTournamentsWithEventAndRoundsByPlayerId(id).stream()
+                .filter(t -> t.getEvent().getStartDate() != null)
+                .sorted(
+                        Comparator.comparing(Tournament::getDivision)
+                                .thenComparing(
+                                        Comparator.comparing(
+                                                        (Tournament t) ->
+                                                                t.getEvent().getStartDate())
+                                                .reversed()))
                 .map(
                         t -> {
                             Event e = t.getEvent();
