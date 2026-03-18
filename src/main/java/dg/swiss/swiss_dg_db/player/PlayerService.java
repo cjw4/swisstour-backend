@@ -146,6 +146,8 @@ public class PlayerService {
 
     public List<PlayerEventsDTO> getPlayerEvents(final Long id) {
         return tournamentRepository.findTournamentsWithEventAndRoundsByPlayerId(id).stream()
+                .filter(t -> t.getEvent().getStartDate() != null)
+                .sorted(Comparator.comparing(t -> t.getEvent().getStartDate()))
                 .map(
                         t -> {
                             Event e = t.getEvent();
