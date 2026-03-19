@@ -105,6 +105,20 @@ public class EventResource {
         return ResponseEntity.ok(eventDTOwDetails);
     }
 
+    @DeleteMapping("/results/{id}")
+    @SecurityRequirement(name = "bearerAuth")
+    public ResponseEntity<Void> deleteEventResults(@PathVariable(name = "id") final Long id) {
+        if (!eventRepository.existsById(id)) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+        eventService.deleteTournaments(id);
+        EventDTO eventDTO = eventService.getEvent(id);
+        if (eventDTO.getHasResults()) {
+            eventService.toggleHasResults(id);
+        }
+        return ResponseEntity.noContent().build();
+    }
+
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteEvent(@PathVariable(name = "id") final Long id) {
         eventService.delete(id);
