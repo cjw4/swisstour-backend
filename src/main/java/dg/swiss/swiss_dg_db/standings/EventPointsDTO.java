@@ -10,5 +10,7 @@ import lombok.Setter;
 public class EventPointsDTO {
     private Long eventId;
     private Double points;
+    private Integer eventPoints;
+    private boolean isChampionship;
     private boolean isIncluded;
 }

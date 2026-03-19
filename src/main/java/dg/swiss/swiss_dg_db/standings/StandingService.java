@@ -13,6 +13,11 @@ public class StandingService {
     private final TournamentRepository tournamentRepository;
 
     public List<StandingDTO> getStandings(String division, Integer year) {
+        StandingsCalculator calculator = StandingsCalculatorFactory.getCalculator(year);
+        if (calculator == null) {
+            return List.of(new StandingDTO(null, List.of(), 0.0, -1));
+        }
+
         List<Tournament> tournaments = tournamentRepository.findTournamentsByDivision(division);
         List<StandingDTO> standingDTOs =
                 tournaments.stream()
@@ -37,32 +42,14 @@ public class StandingService {
                                                                             t.getEvent()
                                                                                     .getEventId(),
                                                                             t.getPoints(),
+                                                                            t.getEvent()
+                                                                                    .getPoints(),
+                                                                            t.getEvent()
+                                                                                    .getIsChampionship(),
                                                                             false))
                                                     .collect(Collectors.toList());
 
-                                    // Sort events by points in descending order
-                                    List<EventPointsDTO> sortedEventPointsDTOs =
-                                            eventPointsDTOs.stream()
-                                                    .sorted(
-                                                            Comparator.comparing(
-                                                                            EventPointsDTO
-                                                                                    ::getPoints)
-                                                                    .reversed())
-                                                    .toList();
-
-                                    // Mark top 7 events as final
-                                    for (int i = 0;
-                                            i < Math.min(7, sortedEventPointsDTOs.size());
-                                            i++) {
-                                        sortedEventPointsDTOs.get(i).setIncluded(true);
-                                    }
-
-                                    // Calculate the total points
-                                    Double totalPoints =
-                                            eventPointsDTOs.stream()
-                                                    .filter(EventPointsDTO::isIncluded)
-                                                    .mapToDouble(EventPointsDTO::getPoints)
-                                                    .sum();
+                                    Double totalPoints = calculator.calculate(eventPointsDTOs);
                                     return new StandingDTO(
                                             playerId, eventPointsDTOs, totalPoints, 0);
                                 })
