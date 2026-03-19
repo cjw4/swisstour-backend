@@ -13,7 +13,6 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 import org.jsoup.Connection;
-import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
@@ -40,7 +39,7 @@ public class EventDetails {
         String url = baseUrl + eventId;
         // Throw exception if url returns 404
         try {
-            Connection.Response response = Jsoup.connect(url).execute();
+            Connection.Response response = JsoupConnectionFactory.connect(url).execute();
             // Continue processing if no exception
         } catch (org.jsoup.HttpStatusException e) {
             if (e.getStatusCode() == 404) {
@@ -50,7 +49,7 @@ public class EventDetails {
             }
         }
         // get the DOM of the event
-        Document document = Jsoup.connect(url).get();
+        Document document = JsoupConnectionFactory.connect(url).get();
         // scrape for event name and set it
         String name = scrapeName(document);
         this.setName(name);
@@ -138,7 +137,7 @@ public class EventDetails {
 
     public void scrapeEventResults(Long eventId, Integer points) throws IOException {
         // get the DOM of the event
-        Document document = Jsoup.connect(baseUrl + eventId).get();
+        Document document = JsoupConnectionFactory.connect(baseUrl + eventId).get();
         // scrape for the tournaments
         this.tournaments = scrapeTournaments(document, points);
     }
