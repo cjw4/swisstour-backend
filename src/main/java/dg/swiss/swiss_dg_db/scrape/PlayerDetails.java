@@ -3,7 +3,6 @@ package dg.swiss.swiss_dg_db.scrape;
 import java.io.IOException;
 import lombok.Getter;
 import lombok.Setter;
-import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.springframework.stereotype.Component;
@@ -24,7 +23,7 @@ public class PlayerDetails {
         this.pdgaNumber = pdgaNumber;
         // get the DOM of the player
         try {
-            Document document = Jsoup.connect(baseUrl + pdgaNumber).get();
+            Document document = JsoupConnectionFactory.connect(baseUrl + pdgaNumber).get();
             // call function to scrape names and assign
             this.firstname = scrapeName(document).getFirstName();
             this.lastname = scrapeName(document).getLastName();

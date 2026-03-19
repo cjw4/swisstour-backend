@@ -126,7 +126,7 @@ public class EventService {
 
             playerDTO.setPdgaNumber(pdgaNumber);
             playerService.addDetails(playerDTO);
-            Thread.sleep(2000);
+            Thread.sleep(1000 + (long) (Math.random() * 2000));
             if (playerService.nameExists(name)) {
                 System.out.println(
                         "Updating player, now PDGA registered, in database: "

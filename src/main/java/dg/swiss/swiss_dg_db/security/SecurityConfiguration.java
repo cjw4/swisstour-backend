@@ -59,6 +59,9 @@ public class SecurityConfiguration {
                                     .requestMatchers(HttpMethod.POST, "/api/events/results/{id}")
                                     .authenticated();
                             authorize
+                                    .requestMatchers(HttpMethod.DELETE, "/api/events/results/{id}")
+                                    .authenticated();
+                            authorize
                                     .requestMatchers(HttpMethod.DELETE, "/api/events/{id}")
                                     .authenticated();
                             authorize
