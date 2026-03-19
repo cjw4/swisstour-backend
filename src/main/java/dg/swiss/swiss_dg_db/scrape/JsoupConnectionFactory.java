@@ -17,7 +17,7 @@ public class JsoupConnectionFactory {
                         "Accept",
                         "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8")
                 .header("Accept-Language", "en-US,en;q=0.5")
-                .header("Accept-Encoding", "gzip, deflate, br")
+                .header("Accept-Encoding", "gzip, deflate")
                 .timeout(10_000);
     }
 }

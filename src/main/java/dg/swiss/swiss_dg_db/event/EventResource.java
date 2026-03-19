@@ -59,8 +59,7 @@ public class EventResource {
         }
 
         // re-collect the event details and scape tournament results (also where swisstour points
-        // are
-        // added)
+        // are added)
         EventDetails eventDetails = eventService.addTournaments(id);
 
         // for each of the tournaments in the event
