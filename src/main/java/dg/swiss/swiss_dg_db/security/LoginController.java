@@ -3,6 +3,8 @@ package dg.swiss.swiss_dg_db.security;
 import dg.swiss.swiss_dg_db.security.jwt.JwtUtil;
 import dg.swiss.swiss_dg_db.user.CustomUser;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.*;
@@ -18,6 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class LoginController {
 
     private final AuthenticationManager authenticationManager;
+    private static final Logger logger = LoggerFactory.getLogger(LoginController.class);
 
     public LoginController(AuthenticationManager authenticationManager) {
         this.authenticationManager = authenticationManager;
@@ -26,16 +29,14 @@ public class LoginController {
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody CustomUser user) {
         try {
-            // Log authentication attempt
-            System.out.println("Login attempt for user:" + user.getUsername());
+            logger.info("Login attempt for user: {}", user.getUsername());
 
             UsernamePasswordAuthenticationToken authenticationToken =
                     new UsernamePasswordAuthenticationToken(user.getUsername(), user.getPassword());
 
             Authentication authentication = authenticationManager.authenticate(authenticationToken);
 
-            // Log successful authentication
-            System.out.println("Authentication successful for user: " + user.getUsername());
+            logger.info("Authenticated user: {}", user.getUsername());
 
             SecurityContextHolder.getContext().setAuthentication(authentication);
 
@@ -43,8 +44,7 @@ public class LoginController {
             return ResponseEntity.ok(jwtToken);
 
         } catch (BadCredentialsException e) {
-            // Specific handling for invalid credentials
-            System.out.println("Invalid credentials for user: " + user.getUsername());
+            logger.warn("Bad credentials for user {}: {}", user.getUsername(), e.getMessage());
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                     .body("Invalid username or password");
 

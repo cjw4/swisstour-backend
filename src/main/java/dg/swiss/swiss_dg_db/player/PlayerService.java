@@ -20,6 +20,8 @@ import java.net.URL;
 import java.util.*;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Sort;
@@ -37,16 +39,24 @@ public class PlayerService {
     @Value("${app.google-sheet.csv-url}")
     private String csvExportUrl;
 
+    private static final Logger logger = LoggerFactory.getLogger(PlayerService.class);
+
     public List<PlayerDTO> findAll() {
         final List<Player> players = playerRepository.findAll(Sort.by("id"));
         return players.stream().map(player -> mapToDTO(player, new PlayerDTO())).toList();
     }
 
     public PlayerDTO get(final Long id) {
-        return playerRepository
-                .findById(id)
-                .map(player -> mapToDTO(player, new PlayerDTO()))
-                .orElseThrow(NotFoundException::new);
+        PlayerDTO playerDTO =
+                playerRepository
+                        .findById(id)
+                        .map(player -> mapToDTO(player, new PlayerDTO()))
+                        .orElseThrow(NotFoundException::new);
+        logger.info(
+                "Player information for {} {} was requested.",
+                playerDTO.getFirstname(),
+                playerDTO.getLastname());
+        return playerDTO;
     }
 
     public PlayerDTO addDetails(PlayerDTO playerDTO) throws IOException {

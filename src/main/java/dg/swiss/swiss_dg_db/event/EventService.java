@@ -16,6 +16,8 @@ import jakarta.transaction.Transactional;
 import java.io.IOException;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
@@ -31,6 +33,7 @@ public class EventService {
     private final TournamentService tournamentService;
     private final RoundResource roundResource;
     private final RoundRepository roundRepository;
+    private static final Logger logger = LoggerFactory.getLogger(EventService.class);
 
     @Transactional
     public List<EventDTO> getEvents(Integer year, String division) {
@@ -128,19 +131,17 @@ public class EventService {
             playerService.addDetails(playerDTO);
             Thread.sleep(1000 + (long) (Math.random() * 2000));
             if (playerService.nameExists(name)) {
-                System.out.println(
-                        "Updating player, now PDGA registered, in database: "
-                                + playerDTO.getFirstname()
-                                + " "
-                                + playerDTO.getLastname());
+                logger.info(
+                        "Updating player, {} {}, now PDGA registered, in database",
+                        playerDTO.getFirstname(),
+                        playerDTO.getLastname());
                 playerService.update(playerDTO.getId(), playerDTO);
             } else {
                 playerDTO.setSwisstourLicense(false);
-                System.out.println(
-                        "Adding registered PDGA player to database: "
-                                + playerDTO.getFirstname()
-                                + " "
-                                + playerDTO.getLastname());
+                logger.info(
+                        "Adding registered PDGA player, {} {}, to the database",
+                        playerDTO.getFirstname(),
+                        playerDTO.getLastname());
                 playerService.create(playerDTO);
             }
 
@@ -153,11 +154,10 @@ public class EventService {
             playerDTO.setLastname(nameInfo.getLastName());
             playerDTO.setIsPro(false);
             playerDTO.setSwisstourLicense(false);
-            System.out.println(
-                    "Adding non-registered PDGA player to database: "
-                            + playerDTO.getFirstname()
-                            + " "
-                            + playerDTO.getLastname());
+            logger.info(
+                    "Adding non-registered PDGA player, {} {}, to the database",
+                    playerDTO.getFirstname(),
+                    playerDTO.getLastname());
             playerService.create(playerDTO);
         }
     }

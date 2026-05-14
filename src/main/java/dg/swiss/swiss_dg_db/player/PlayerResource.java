@@ -8,6 +8,8 @@ import jakarta.validation.Valid;
 import java.io.IOException;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -20,6 +22,7 @@ import org.springframework.web.bind.annotation.*;
 public class PlayerResource {
 
     private final PlayerService playerService;
+    private static final Logger logger = LoggerFactory.getLogger(PlayerResource.class);
 
     @GetMapping
     @SecurityRequirement(name = "bearerAuth")
@@ -65,6 +68,7 @@ public class PlayerResource {
     @PostMapping("/update")
     public ResponseEntity<List<PlayerDTO>> addPlayersFromGoogleSheet()
             throws IOException, InterruptedException {
+        logger.info("Updated SDA Licenses.");
         return ResponseEntity.ok(playerService.addPlayersFromGoogleSheet());
     }
 }
