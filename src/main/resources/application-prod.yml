@@ -1,0 +1,31 @@
+spring:
+  jpa:
+    hibernate:
+      ddl-auto: validate
+  datasource:
+    url: ${JDBC_DATABASE_URL:jdbc:postgresql://dpg-d51cdomuk2gs73c6agk0-a.frankfurt-postgres.render.com:5432/swiss_dg_db}
+    username: ${JDBC_DATABASE_USERNAME:${DB_USERNAME}}
+    password: ${JDBC_DATABASE_PASSWORD:${DB_PASSWORD}}
+  flyway:
+    enabled: true
+    baseline-on-migrate: true
+error:
+  handling:
+    exception-logging: NO_LOGGING
+app:
+  frontend:
+    url: "https://swisstour.onrender.com"
+    urlDiscgolf: "https://swisstour.discgolf.ch"
+springdoc:
+  api-docs:
+    enabled: false
+  swagger-ui:
+    enabled: false
+logging:
+  level:
+    org.springframework:
+      WARN
+    dg.swiss.swiss_dg_db:
+      INFO
+
+

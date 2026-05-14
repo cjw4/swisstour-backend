@@ -1,4 +1,3 @@
----
 spring:
   jpa:
     open-in-view: false
@@ -9,63 +8,17 @@ spring:
             non_contextual_creation: true
         id:
           new_generator_mappings: true
-  profiles:
-    active: dev
-app:
-  google-sheet:
-    csv-url: ${GOOGLE_SHEET_CSV_URL}
----
-spring:
-  config:
-    activate:
-      on-profile: dev
-  jpa:
-    hibernate:
-      ddl-auto: update
-  datasource:
-    url: ${JDBC_DATABASE_URL:jdbc:postgresql://localhost:5432/swiss-dg-db}
-    username: ${JDBC_DATABASE_USERNAME:${DB_USERNAME_DEV}}
-    password: ${JDBC_DATABASE_PASSWORD:${DB_PASSWORD_DEV}}
-    hikari:
-      connection-timeout: 30000
-      maximum-pool-size: 10
-  flyway:
-    baseline-on-migrate: true
 error:
   handling:
     http-status-in-json-response: true
-    exception-logging: NO_LOGGING
-    full-stacktrace-http-statuses: 5xx
     log-levels:
       5xx: ERROR
     codes:
       PlayerPdgaNumberUnique: PLAYER_PDGA_NUMBER_UNIQUE
       PlayerSdaNumberUnique: PLAYER_SDA_NUMBER_UNIQUE
-server:
-  error:
-    include-message: always
 app:
-  frontend:
-    url: "http://localhost:4200"
-    urlDiscgolf: ""
----
-spring:
-  config:
-    activate:
-      on-profile: prod
-  datasource:
-    url: ${JDBC_DATABASE_URL:jdbc:postgresql://dpg-d51cdomuk2gs73c6agk0-a.frankfurt-postgres.render.com:5432/swiss_dg_db}
-    username: ${JDBC_DATABASE_USERNAME:${DB_USERNAME}}
-    password: ${JDBC_DATABASE_PASSWORD:${DB_PASSWORD}}
-  jpa:
-    hibernate:
-      ddl-auto: validate
-  flyway:
-    enabled: true
-    baseline-on-migrate: true
-app:
-  frontend:
-    url: "https://swisstour.onrender.com"
-    urlDiscgolf: "https://swisstour.discgolf.ch"
+  google-sheet:
+    csv-url: ${GOOGLE_SHEET_CSV_URL}
+
 
 
