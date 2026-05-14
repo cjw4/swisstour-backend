@@ -24,10 +24,8 @@ app:
     urlDiscgolf: ""
 logging:
   level:
-    root:
-      WARN
-    dg.swiss.swiss_dg_db:
-      DEBUG
+    root: INFO
+    dg.swiss.swiss_dg_db: DEBUG
 
 
 

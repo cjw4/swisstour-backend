@@ -10,6 +10,8 @@ import dg.swiss.swiss_dg_db.player.PlayerRepository;
 import dg.swiss.swiss_dg_db.util.NotFoundException;
 import dg.swiss.swiss_dg_db.util.ReferencedException;
 import java.util.List;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.event.EventListener;
 import org.springframework.data.domain.Sort;
@@ -22,6 +24,7 @@ public class TournamentService {
     private final EventRepository eventRepository;
     private final PlayerRepository playerRepository;
     private final ApplicationEventPublisher publisher;
+    private static final Logger logger = LoggerFactory.getLogger(TournamentService.class);
 
     public TournamentService(
             final TournamentRepository tournamentRepository,
@@ -58,15 +61,16 @@ public class TournamentService {
                     .findById(tournamentDTO.getPlayer())
                     .ifPresentOrElse(
                             player -> {
-                                System.out.println(
-                                        "Adding tournament to database for: "
-                                                + player.getFirstname()
-                                                + " "
-                                                + player.getLastname());
+                                logger.info(
+                                        "Adding {} tournament to database for {} {}",
+                                        tournamentDTO.getDivision(),
+                                        player.getFirstname(),
+                                        player.getLastname());
                             },
                             () -> {
-                                System.out.println(
-                                        "Player was not found in the database, no tournament created.");
+                                logger.warn(
+                                        "Player with id {} not found, no tournament was created",
+                                        tournamentDTO.getPlayer());
                             });
             return tournamentRepository.save(tournament).getId();
         } else {

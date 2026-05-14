@@ -23,9 +23,8 @@ springdoc:
     enabled: false
 logging:
   level:
-    org.springframework:
-      WARN
-    dg.swiss.swiss_dg_db:
-      INFO
+    root: WARN
+    dg.swiss.swiss_dg_db: INFO
+
 
 

@@ -10,6 +10,8 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Objects;
 import lombok.AllArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -23,6 +25,7 @@ public class EventResource {
 
     private final EventService eventService;
     private final EventRepository eventRepository;
+    private static final Logger logger = LoggerFactory.getLogger(EventResource.class);
 
     @GetMapping
     @SecurityRequirement(name = "bearerAuth")
@@ -77,6 +80,7 @@ public class EventResource {
         }
 
         eventService.toggleHasResults(id);
+        logger.info("Event results for {} added.", eventDetails.getName());
         return new ResponseEntity<>(id, HttpStatus.OK);
     }
 
@@ -116,6 +120,7 @@ public class EventResource {
         if (eventDTO.getHasResults()) {
             eventService.toggleHasResults(id);
         }
+        logger.info("Event results for {} deleted.", eventDTO.getName());
         return ResponseEntity.noContent().build();
     }
 
