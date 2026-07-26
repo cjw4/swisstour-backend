@@ -12,6 +12,7 @@ spring:
     driver-class-name: org.postgresql.Driver
   flyway:
     baseline-on-migrate: true
+    out-of-order: true
 error:
   handling:
     full-stacktrace-http-statuses: 5xx
