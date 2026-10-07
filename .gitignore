@@ -8,6 +8,7 @@ application-local.yml
 .DS_Store
 .env
 *.env
+*.sql
 
 ## IntelliJ IDEA
 .idea
