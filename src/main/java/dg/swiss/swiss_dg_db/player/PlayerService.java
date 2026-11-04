@@ -61,10 +61,12 @@ public class PlayerService {
 
     public PlayerDTO addDetails(PlayerDTO playerDTO) throws IOException {
         if (playerDTO.getPdgaNumber() != null) {
-            playerDetails.scrapePlayerInfo(playerDTO.getPdgaNumber());
-            playerDTO.setFirstname(playerDetails.getFirstname());
-            playerDTO.setLastname(playerDetails.getLastname());
-            playerDTO.setIsPro(playerDetails.getIsPro());
+            PdgaApiPlayerDTO pdgaApiPlayerDTO =
+                    playerDetails.getPlayerInfoFromApi(playerDTO.getPdgaNumber());
+            // playerDetails.scrapePlayerInfo(playerDTO.getPdgaNumber());
+            playerDTO.setFirstname(pdgaApiPlayerDTO.getFirst_name());
+            playerDTO.setLastname(pdgaApiPlayerDTO.getLast_name());
+            playerDTO.setIsPro(pdgaApiPlayerDTO.getPlayerClass() == "P");
         } else {
             playerDTO.setIsPro(false);
         }

@@ -24,6 +24,9 @@ app:
   frontend:
     url: "http://localhost:4200"
     urlDiscgolf: "http://172.20.10.2:4200"
+  pdga-api:
+    username: ${PDGA_USERNAME}
+    password: ${PDGA_PASSWORD}
 logging:
   level:
     root: INFO
