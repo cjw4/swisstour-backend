@@ -5,6 +5,8 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import dg.swiss.swiss_dg_db.player.exceptions.GoogleSheetUnavailableException;
 import dg.swiss.swiss_dg_db.scrape.PlayerDetails;
 import dg.swiss.swiss_dg_db.tournament.TournamentRepository;
@@ -30,6 +32,20 @@ class PlayerServiceTest {
     @Mock private TournamentRepository tournamentRepository;
 
     private PlayerService playerService;
+
+    private static PdgaApiPlayerDTO pdgaApiPlayer(
+            String firstName, String lastName, long pdgaNumber, String playerClass) {
+        String json =
+                """
+                {"first_name": "%s", "last_name": "%s", "pdga_number": %d, "class": "%s"}
+                """
+                        .formatted(firstName, lastName, pdgaNumber, playerClass);
+        try {
+            return new ObjectMapper().readValue(json, PdgaApiPlayerDTO.class);
+        } catch (JsonProcessingException e) {
+            throw new IllegalStateException(e);
+        }
+    }
 
     @BeforeEach
     void setUp() {
@@ -325,15 +341,14 @@ class PlayerServiceTest {
                         .build();
         when(playerRepository.save(any())).thenReturn(savedPlayer);
         when(playerRepository.findById(1L)).thenReturn(Optional.of(savedPlayer));
-        when(playerDetails.getFirstname()).thenReturn("Paul");
-        when(playerDetails.getLastname()).thenReturn("McBeth");
-        when(playerDetails.getIsPro()).thenReturn(false);
+        when(playerDetails.getPlayerInfoFromApi(27523L))
+                .thenReturn(pdgaApiPlayer("Paul", "McBeth", 27523L, "A"));
 
         // Act
         List<PlayerDTO> result = playerService.addPlayersFromGoogleSheet();
 
         // Assert
-        verify(playerDetails).scrapePlayerInfo(27523L);
+        verify(playerDetails).getPlayerInfoFromApi(27523L);
         verify(playerRepository).save(any());
         assertThat(result).hasSize(1);
         assertThat(result.get(0).getSdaNumber()).isEqualTo(1001L);

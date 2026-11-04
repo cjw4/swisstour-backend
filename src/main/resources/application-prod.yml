@@ -15,9 +15,6 @@ app:
   frontend:
     url: "https://swisstour.onrender.com"
     urlDiscgolf: "https://swisstour.discgolf.ch"
-  pdga-api:
-    username: ${PDGA_USERNAME}
-    password: ${PDGA_PASSWORD}
 springdoc:
   api-docs:
     enabled: false

@@ -16,3 +16,6 @@ app:
     urlDiscgolf: ""
   google-sheet:
     csv-url: "placeholder"
+  pdga-api:
+    username: "placeholder"
+    password: "placeholder"
