@@ -7,8 +7,9 @@ import static org.mockito.Mockito.*;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import dg.swiss.swiss_dg_db.pdga_api.PdgaApiPlayerResponseDTO;
+import dg.swiss.swiss_dg_db.pdga_api.PdgaApiPlayerService;
 import dg.swiss.swiss_dg_db.player.exceptions.GoogleSheetUnavailableException;
-import dg.swiss.swiss_dg_db.scrape.PlayerDetails;
 import dg.swiss.swiss_dg_db.tournament.TournamentRepository;
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -28,12 +29,12 @@ class PlayerServiceTest {
 
     @Mock private PlayerRepository playerRepository;
     @Mock private ApplicationEventPublisher publisher;
-    @Mock private PlayerDetails playerDetails;
+    @Mock private PdgaApiPlayerService pdgaApiPlayerService;
     @Mock private TournamentRepository tournamentRepository;
 
     private PlayerService playerService;
 
-    private static PdgaApiPlayerDTO pdgaApiPlayer(
+    private static PdgaApiPlayerResponseDTO pdgaApiPlayer(
             String firstName, String lastName, long pdgaNumber, String playerClass) {
         String json =
                 """
@@ -41,7 +42,7 @@ class PlayerServiceTest {
                 """
                         .formatted(firstName, lastName, pdgaNumber, playerClass);
         try {
-            return new ObjectMapper().readValue(json, PdgaApiPlayerDTO.class);
+            return new ObjectMapper().readValue(json, PdgaApiPlayerResponseDTO.class);
         } catch (JsonProcessingException e) {
             throw new IllegalStateException(e);
         }
@@ -52,7 +53,10 @@ class PlayerServiceTest {
         playerService =
                 spy(
                         new PlayerService(
-                                playerRepository, publisher, playerDetails, tournamentRepository));
+                                playerRepository,
+                                publisher,
+                                pdgaApiPlayerService,
+                                tournamentRepository));
     }
 
     // -------------------------------------------------------------------------
@@ -341,14 +345,14 @@ class PlayerServiceTest {
                         .build();
         when(playerRepository.save(any())).thenReturn(savedPlayer);
         when(playerRepository.findById(1L)).thenReturn(Optional.of(savedPlayer));
-        when(playerDetails.getPlayerInfoFromApi(27523L))
+        when(pdgaApiPlayerService.getPlayerInfo(27523L))
                 .thenReturn(pdgaApiPlayer("Paul", "McBeth", 27523L, "A"));
 
         // Act
         List<PlayerDTO> result = playerService.addPlayersFromGoogleSheet();
 
         // Assert
-        verify(playerDetails).getPlayerInfoFromApi(27523L);
+        verify(pdgaApiPlayerService).getPlayerInfo(27523L);
         verify(playerRepository).save(any());
         assertThat(result).hasSize(1);
         assertThat(result.get(0).getSdaNumber()).isEqualTo(1001L);

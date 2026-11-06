@@ -1,4 +1,4 @@
-package dg.swiss.swiss_dg_db.player;
+package dg.swiss.swiss_dg_db.pdga_api;
 
 import java.util.List;
 import lombok.Getter;
@@ -7,5 +7,5 @@ import lombok.Getter;
 public class PdgaApiPlayersResponseDTO {
     String sessionid;
     int status;
-    List<PdgaApiPlayerDTO> players;
+    List<PdgaApiPlayerResponseDTO> players;
 }

@@ -1,10 +1,10 @@
-package dg.swiss.swiss_dg_db.player;
+package dg.swiss.swiss_dg_db.pdga_api;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
 
 @Getter
-public class PdgaApiPlayerDTO {
+public class PdgaApiPlayerResponseDTO {
     private String first_name;
     private String last_name;
     private Long pdga_number;

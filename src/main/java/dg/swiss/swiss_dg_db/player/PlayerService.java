@@ -5,10 +5,11 @@ import static java.lang.Long.parseLong;
 import dg.swiss.swiss_dg_db.event.Event;
 import dg.swiss.swiss_dg_db.event.PlayerEventsDTO;
 import dg.swiss.swiss_dg_db.events.BeforeDeletePlayer;
+import dg.swiss.swiss_dg_db.pdga_api.PdgaApiPlayerResponseDTO;
+import dg.swiss.swiss_dg_db.pdga_api.PdgaApiPlayerService;
 import dg.swiss.swiss_dg_db.player.exceptions.GoogleSheetUnavailableException;
 import dg.swiss.swiss_dg_db.round.RoundDTOsmall;
 import dg.swiss.swiss_dg_db.scrape.NameConverter;
-import dg.swiss.swiss_dg_db.scrape.PlayerDetails;
 import dg.swiss.swiss_dg_db.tournament.Tournament;
 import dg.swiss.swiss_dg_db.tournament.TournamentRepository;
 import dg.swiss.swiss_dg_db.util.NotFoundException;
@@ -33,7 +34,8 @@ public class PlayerService {
 
     private final PlayerRepository playerRepository;
     private final ApplicationEventPublisher publisher;
-    private final PlayerDetails playerDetails;
+    // private final PlayerDetails playerDetails;
+    private final PdgaApiPlayerService pdgaApiPlayerService;
     private final TournamentRepository tournamentRepository;
 
     @Value("${app.google-sheet.csv-url}")
@@ -61,9 +63,8 @@ public class PlayerService {
 
     public PlayerDTO addDetails(PlayerDTO playerDTO) throws IOException {
         if (playerDTO.getPdgaNumber() != null) {
-            PdgaApiPlayerDTO pdgaApiPlayerDTO =
-                    playerDetails.getPlayerInfoFromApi(playerDTO.getPdgaNumber());
-            // playerDetails.scrapePlayerInfo(playerDTO.getPdgaNumber());
+            PdgaApiPlayerResponseDTO pdgaApiPlayerDTO =
+                    pdgaApiPlayerService.getPlayerInfo(playerDTO.getPdgaNumber());
             playerDTO.setFirstname(pdgaApiPlayerDTO.getFirst_name());
             playerDTO.setLastname(pdgaApiPlayerDTO.getLast_name());
             playerDTO.setIsPro(pdgaApiPlayerDTO.getPlayerClass() == "P");
