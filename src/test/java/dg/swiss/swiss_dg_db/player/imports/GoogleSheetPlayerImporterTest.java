@@ -259,6 +259,44 @@ class GoogleSheetPlayerImporterTest {
     }
 
     @Test
+    void addPlayersFromGoogleSheet_sdaAlreadyHeldByOtherDbPlayer_isNotAssignedTwiceOrCreated()
+            throws IOException, InterruptedException {
+        PlayerDTO sheetPlayer =
+                PlayerDTO.builder()
+                        .sdaNumber(4001L)
+                        .pdgaNumber(null)
+                        .firstname("Paul")
+                        .lastname("McBeth")
+                        .swisstourLicense(true)
+                        .build();
+        PlayerDTO holder =
+                PlayerDTO.builder()
+                        .id(1L)
+                        .sdaNumber(4001L)
+                        .firstname("Paul")
+                        .lastname("McBeth")
+                        .swisstourLicense(true)
+                        .build();
+        PlayerDTO withPdga =
+                PlayerDTO.builder()
+                        .id(2L)
+                        .sdaNumber(null)
+                        .pdgaNumber(27523L)
+                        .firstname("Paul")
+                        .lastname("McBeth")
+                        .swisstourLicense(false)
+                        .build();
+
+        doReturn(List.of(sheetPlayer)).when(importer).readGoogleSheet();
+        when(playerService.findAll()).thenReturn(List.of(holder, withPdga));
+
+        importer.addPlayersFromGoogleSheet();
+
+        assertThat(withPdga.getSdaNumber()).isNull();
+        verify(playerService, never()).create(any());
+    }
+
+    @Test
     void addPlayersFromGoogleSheet_noMatch_setsLicenseFalse()
             throws IOException, InterruptedException {
         // Arrange - empty sheet means no DB player can match

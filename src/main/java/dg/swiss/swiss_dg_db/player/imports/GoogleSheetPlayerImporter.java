@@ -12,12 +12,16 @@ import java.net.URL;
 import java.util.*;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
 public class GoogleSheetPlayerImporter {
+
+    private static final Logger logger = LoggerFactory.getLogger(GoogleSheetPlayerImporter.class);
 
     private final PlayerService playerService;
 
@@ -52,6 +56,14 @@ public class GoogleSheetPlayerImporter {
                                         p -> p));
 
         Set<Long> matchedSheetSdaNumbers = new HashSet<>();
+
+        // SDA numbers already held by a player in the DB. The SDA number column is unique, so an
+        // SDA number may never be assigned to a second player.
+        Set<Long> claimedSdaNumbers =
+                playersFromDB.stream()
+                        .map(PlayerDTO::getSdaNumber)
+                        .filter(Objects::nonNull)
+                        .collect(Collectors.toSet());
         List<PlayerDTO> updatedPlayers = new ArrayList<>();
 
         // Go through the PlayerDTOs from the DB and check for matches to the PlayerDTOs from Google
@@ -77,7 +89,13 @@ public class GoogleSheetPlayerImporter {
             if (match == null && player.getPdgaNumber() != null) {
                 match = sheetByPdga.get(player.getPdgaNumber());
                 if (match != null) {
-                    player.setSdaNumber(match.getSdaNumber());
+                    if (claimedSdaNumbers.contains(match.getSdaNumber())) {
+                        logSdaConflict(player, match);
+                        match = null;
+                    } else {
+                        player.setSdaNumber(match.getSdaNumber());
+                        claimedSdaNumbers.add(match.getSdaNumber());
+                    }
                 }
             }
 
@@ -94,8 +112,13 @@ public class GoogleSheetPlayerImporter {
                         && (nameMatch.getPdgaNumber() == null
                                 || nameMatch.getPdgaNumber().equals(player.getPdgaNumber())
                                 || player.getPdgaNumber() == null)) {
-                    match = nameMatch;
-                    player.setSdaNumber(match.getSdaNumber());
+                    if (claimedSdaNumbers.contains(nameMatch.getSdaNumber())) {
+                        logSdaConflict(player, nameMatch);
+                    } else {
+                        match = nameMatch;
+                        player.setSdaNumber(match.getSdaNumber());
+                        claimedSdaNumbers.add(match.getSdaNumber());
+                    }
                 }
             }
 
@@ -128,6 +151,10 @@ public class GoogleSheetPlayerImporter {
         // If the player from the Google sheet was not found in the DB, create it.
         List<PlayerDTO> createdPlayers = new ArrayList<>();
         for (PlayerDTO player : playersFromSheet) {
+            if (claimedSdaNumbers.contains(player.getSdaNumber())) {
+                // Already held by a DB player (matched above, or a conflict that was logged).
+                continue;
+            }
             if (!matchedSheetSdaNumbers.contains(player.getSdaNumber())) {
                 PlayerDTO withDetails = playerService.addDetails(player);
                 Long id = playerService.create(withDetails);
@@ -138,6 +165,19 @@ public class GoogleSheetPlayerImporter {
         List<PlayerDTO> allPlayers = new ArrayList<>(updatedPlayers);
         allPlayers.addAll(createdPlayers);
         return allPlayers;
+    }
+
+    private void logSdaConflict(PlayerDTO dbPlayer, PlayerDTO sheetPlayer) {
+        logger.warn(
+                "SDA number {} from the sheet ({} {}) is already assigned to another player in the"
+                        + " DB; not assigning it to DB player {} ({} {}). Check for duplicate"
+                        + " players.",
+                sheetPlayer.getSdaNumber(),
+                sheetPlayer.getFirstname(),
+                sheetPlayer.getLastname(),
+                dbPlayer.getId(),
+                dbPlayer.getFirstname(),
+                dbPlayer.getLastname());
     }
 
     public List<PlayerDTO> readGoogleSheet() {
