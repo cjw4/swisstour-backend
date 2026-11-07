@@ -5,7 +5,7 @@ import lombok.Getter;
 
 @Getter
 public class PdgaApiPlayersResponseDTO {
-    String sessionid;
+    String sessid;
     int status;
     List<PdgaApiPlayerResponseDTO> players;
 }
