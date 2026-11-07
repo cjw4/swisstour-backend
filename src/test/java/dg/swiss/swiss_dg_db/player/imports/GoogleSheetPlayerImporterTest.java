@@ -2,6 +2,7 @@ package dg.swiss.swiss_dg_db.player.imports;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 import dg.swiss.swiss_dg_db.player.PlayerDTO;
@@ -223,6 +224,38 @@ class GoogleSheetPlayerImporterTest {
         assertThat(result).hasSize(1);
         assertThat(result.get(0).getSwisstourLicense()).isTrue();
         assertThat(result.get(0).getSdaNumber()).isEqualTo(3001L);
+    }
+
+    @Test
+    void addPlayersFromGoogleSheet_dbPlayerHasPdgaSheetHasNone_matchByNameAddsSda()
+            throws IOException, InterruptedException {
+        PlayerDTO sheetPlayer =
+                PlayerDTO.builder()
+                        .sdaNumber(4001L)
+                        .pdgaNumber(null)
+                        .firstname("Paul")
+                        .lastname("McBeth")
+                        .swisstourLicense(true)
+                        .build();
+        PlayerDTO dbPlayer =
+                PlayerDTO.builder()
+                        .id(1L)
+                        .sdaNumber(null)
+                        .pdgaNumber(27523L)
+                        .firstname("Paul")
+                        .lastname("McBeth")
+                        .swisstourLicense(false)
+                        .build();
+
+        doReturn(List.of(sheetPlayer)).when(importer).readGoogleSheet();
+        when(playerService.findAll()).thenReturn(List.of(dbPlayer));
+
+        List<PlayerDTO> result = importer.addPlayersFromGoogleSheet();
+
+        assertThat(result).hasSize(1);
+        assertThat(result.get(0).getSdaNumber()).isEqualTo(4001L);
+        assertThat(result.get(0).getSwisstourLicense()).isTrue();
+        verify(playerService, never()).create(any());
     }
 
     @Test

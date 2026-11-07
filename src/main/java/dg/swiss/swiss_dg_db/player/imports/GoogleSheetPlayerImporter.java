@@ -81,13 +81,20 @@ public class GoogleSheetPlayerImporter {
                 }
             }
 
-            // 3. If no match has yet to be found and the PlayerDTO from DB does not have a SDA
-            // Number or PDGA Number, a match of name in the sheet is attempted.
-            if (match == null && player.getSdaNumber() == null && player.getPdgaNumber() == null) {
+            // 3. If no match has yet been found and the PlayerDTO from DB does not have an SDA
+            // number, a match by name in the sheet is attempted. This also covers players that
+            // already have a PDGA number in the DB but whose sheet row has no (or the same) PDGA
+            // number, so that the SDA number is added to the existing player instead of creating a
+            // new one. A sheet row with a different PDGA number is a different person.
+            if (match == null && player.getSdaNumber() == null) {
                 String fullName =
                         (player.getFirstname() + " " + player.getLastname()).toLowerCase();
-                match = sheetByName.get(fullName);
-                if (match != null) {
+                PlayerDTO nameMatch = sheetByName.get(fullName);
+                if (nameMatch != null
+                        && (nameMatch.getPdgaNumber() == null
+                                || nameMatch.getPdgaNumber().equals(player.getPdgaNumber())
+                                || player.getPdgaNumber() == null)) {
+                    match = nameMatch;
                     player.setSdaNumber(match.getSdaNumber());
                 }
             }
