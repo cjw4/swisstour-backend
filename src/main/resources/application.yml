@@ -19,6 +19,10 @@ error:
 app:
   google-sheet:
     csv-url: ${GOOGLE_SHEET_CSV_URL}
+  pdga-api:
+    url: https://www.pdga.com/services/json/
+    username: ${PDGA_USERNAME}
+    password: ${PDGA_PASSWORD}
 
 
 

@@ -144,7 +144,6 @@ public class EventService {
                         playerDTO.getLastname());
                 playerService.create(playerDTO);
             }
-
             // Search by Name
         } else if (pdgaNumber == null && !playerService.nameExists(name)) {
             playerDTO = new PlayerDTO();
