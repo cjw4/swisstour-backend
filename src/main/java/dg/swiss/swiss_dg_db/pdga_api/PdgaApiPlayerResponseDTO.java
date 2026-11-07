@@ -1,6 +1,7 @@
 package dg.swiss.swiss_dg_db.pdga_api;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import java.time.LocalDate;
 import lombok.Getter;
 
 @Getter
@@ -22,5 +23,5 @@ public class PdgaApiPlayerResponseDTO {
     private Integer rating_rounds_used;
     private Long points;
     private Long prize;
-    private String last_modified;
+    private LocalDate last_modified;
 }

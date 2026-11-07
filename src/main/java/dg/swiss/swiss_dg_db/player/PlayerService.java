@@ -34,7 +34,6 @@ public class PlayerService {
 
     private final PlayerRepository playerRepository;
     private final ApplicationEventPublisher publisher;
-    // private final PlayerDetails playerDetails;
     private final PdgaApiPlayerService pdgaApiPlayerService;
     private final TournamentRepository tournamentRepository;
 
@@ -67,7 +66,7 @@ public class PlayerService {
                     pdgaApiPlayerService.getPlayerInfo(playerDTO.getPdgaNumber());
             playerDTO.setFirstname(pdgaApiPlayerDTO.getFirst_name());
             playerDTO.setLastname(pdgaApiPlayerDTO.getLast_name());
-            playerDTO.setIsPro(pdgaApiPlayerDTO.getPlayerClass() == "P");
+            playerDTO.setIsPro("P".equals(pdgaApiPlayerDTO.getPlayerClass()));
         } else {
             playerDTO.setIsPro(false);
         }

@@ -1,5 +1,6 @@
 package dg.swiss.swiss_dg_db.pdga_api;
 
+import java.util.Comparator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -42,7 +43,7 @@ public class PdgaApiPlayerService {
                                                 .path("player-statistics")
                                                 .queryParam(
                                                         "pdga_number", String.valueOf(pdgaNumber))
-                                                .queryParam("year", "2026")
+                                                // .queryParam("year", "2026")
                                                 .build())
                         .header(
                                 HttpHeaders.COOKIE,
@@ -52,7 +53,6 @@ public class PdgaApiPlayerService {
                         .accept(MediaType.APPLICATION_JSON)
                         .retrieve()
                         .body(PdgaApiPlayersResponseDTO.class);
-        // Implement the logic to get player statistics using the sessionId and token
         if (playerInfo == null
                 || playerInfo.getPlayers() == null
                 || playerInfo.getPlayers().isEmpty()) {
@@ -60,6 +60,11 @@ public class PdgaApiPlayerService {
             throw new RuntimeException(
                     "Failed to retrieve player information for PDGA number: " + pdgaNumber);
         }
-        return playerInfo.getPlayers().getFirst();
+        return playerInfo.getPlayers().stream()
+                .max(
+                        Comparator.comparing(
+                                PdgaApiPlayerResponseDTO::getLast_modified,
+                                Comparator.nullsFirst(Comparator.naturalOrder())))
+                .orElseThrow();
     }
 }
