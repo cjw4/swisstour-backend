@@ -1,62 +1,33 @@
-package dg.swiss.swiss_dg_db.player;
+package dg.swiss.swiss_dg_db.player.imports;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import dg.swiss.swiss_dg_db.pdga_api.PdgaApiPlayerResponseDTO;
-import dg.swiss.swiss_dg_db.pdga_api.PdgaApiPlayerService;
+import dg.swiss.swiss_dg_db.player.PlayerDTO;
+import dg.swiss.swiss_dg_db.player.PlayerService;
 import dg.swiss.swiss_dg_db.player.exceptions.GoogleSheetUnavailableException;
-import dg.swiss.swiss_dg_db.tournament.TournamentRepository;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.StringReader;
 import java.util.List;
-import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.test.util.ReflectionTestUtils;
 
 @ExtendWith(MockitoExtension.class)
-class PlayerServiceTest {
+class GoogleSheetPlayerImporterTest {
 
-    @Mock private PlayerRepository playerRepository;
-    @Mock private ApplicationEventPublisher publisher;
-    @Mock private PdgaApiPlayerService pdgaApiPlayerService;
-    @Mock private TournamentRepository tournamentRepository;
+    @Mock private PlayerService playerService;
 
-    private PlayerService playerService;
-
-    private static PdgaApiPlayerResponseDTO pdgaApiPlayer(
-            String firstName, String lastName, long pdgaNumber, String playerClass) {
-        String json =
-                """
-                {"first_name": "%s", "last_name": "%s", "pdga_number": %d, "class": "%s"}
-                """
-                        .formatted(firstName, lastName, pdgaNumber, playerClass);
-        try {
-            return new ObjectMapper().readValue(json, PdgaApiPlayerResponseDTO.class);
-        } catch (JsonProcessingException e) {
-            throw new IllegalStateException(e);
-        }
-    }
+    private GoogleSheetPlayerImporter importer;
 
     @BeforeEach
     void setUp() {
-        playerService =
-                spy(
-                        new PlayerService(
-                                playerRepository,
-                                publisher,
-                                pdgaApiPlayerService,
-                                tournamentRepository));
+        importer = spy(new GoogleSheetPlayerImporter(playerService));
     }
 
     // -------------------------------------------------------------------------
@@ -65,9 +36,9 @@ class PlayerServiceTest {
 
     @Test
     void readGoogleSheet_inaccessibleUrl_throwsGoogleSheetUnavailableException() {
-        ReflectionTestUtils.setField(playerService, "csvExportUrl", "not-a-valid-url");
+        ReflectionTestUtils.setField(importer, "csvExportUrl", "not-a-valid-url");
 
-        assertThatThrownBy(() -> playerService.readGoogleSheet())
+        assertThatThrownBy(() -> importer.readGoogleSheet())
                 .isInstanceOf(GoogleSheetUnavailableException.class)
                 .hasMessageContaining("not-a-valid-url")
                 .hasCauseInstanceOf(java.io.IOException.class);
@@ -82,7 +53,7 @@ class PlayerServiceTest {
         String csv = "SDA,PDGA,Nachname,Vorname\nSDA1001,27523,McBeth,Paul\n";
         BufferedReader reader = new BufferedReader(new StringReader(csv));
 
-        List<PlayerDTO> result = playerService.parseGoogleSheetCsv(reader);
+        List<PlayerDTO> result = importer.parseGoogleSheetCsv(reader);
 
         assertThat(result).hasSize(1);
         PlayerDTO player = result.get(0);
@@ -98,7 +69,7 @@ class PlayerServiceTest {
         String csv = "SDA,PDGA,Nachname,Vorname\nABC1001XY,27523,McBeth,Paul\n";
         BufferedReader reader = new BufferedReader(new StringReader(csv));
 
-        List<PlayerDTO> result = playerService.parseGoogleSheetCsv(reader);
+        List<PlayerDTO> result = importer.parseGoogleSheetCsv(reader);
 
         assertThat(result).hasSize(1);
         assertThat(result.get(0).getSdaNumber()).isEqualTo(1001L);
@@ -109,7 +80,7 @@ class PlayerServiceTest {
         String csv = "SDA,PDGA,Nachname,Vorname\nSDA1001,,McBeth,Paul\n";
         BufferedReader reader = new BufferedReader(new StringReader(csv));
 
-        List<PlayerDTO> result = playerService.parseGoogleSheetCsv(reader);
+        List<PlayerDTO> result = importer.parseGoogleSheetCsv(reader);
 
         assertThat(result).hasSize(1);
         assertThat(result.get(0).getPdgaNumber()).isNull();
@@ -120,7 +91,7 @@ class PlayerServiceTest {
         String csv = "SDA,PDGA,Nachname,Vorname\nSDA1001,27523\n";
         BufferedReader reader = new BufferedReader(new StringReader(csv));
 
-        List<PlayerDTO> result = playerService.parseGoogleSheetCsv(reader);
+        List<PlayerDTO> result = importer.parseGoogleSheetCsv(reader);
 
         assertThat(result).isEmpty();
     }
@@ -131,7 +102,7 @@ class PlayerServiceTest {
                 "SDA,PDGA,Nachname,Vorname\nSDA1001,27523,McBeth,Paul\n\nSDA1002,12345,Doe,Jane\n";
         BufferedReader reader = new BufferedReader(new StringReader(csv));
 
-        List<PlayerDTO> result = playerService.parseGoogleSheetCsv(reader);
+        List<PlayerDTO> result = importer.parseGoogleSheetCsv(reader);
 
         assertThat(result).hasSize(1);
         assertThat(result.get(0).getSdaNumber()).isEqualTo(1001L);
@@ -142,7 +113,7 @@ class PlayerServiceTest {
         String csv = "SDA,PDGA,Nachname,Vorname\nSDA1001,27523,McBeth,Paul\nSDA1002,,Doe,Jane\n";
         BufferedReader reader = new BufferedReader(new StringReader(csv));
 
-        List<PlayerDTO> result = playerService.parseGoogleSheetCsv(reader);
+        List<PlayerDTO> result = importer.parseGoogleSheetCsv(reader);
 
         assertThat(result).hasSize(2);
         assertThat(result.get(0).getSdaNumber()).isEqualTo(1001L);
@@ -175,12 +146,11 @@ class PlayerServiceTest {
                         .swisstourLicense(false)
                         .build();
 
-        doReturn(List.of(sheetPlayer)).when(playerService).readGoogleSheet();
-        doReturn(List.of(dbPlayer)).when(playerService).findAll();
-        stubUpdate(1L);
+        doReturn(List.of(sheetPlayer)).when(importer).readGoogleSheet();
+        when(playerService.findAll()).thenReturn(List.of(dbPlayer));
 
         // Act
-        List<PlayerDTO> result = playerService.addPlayersFromGoogleSheet();
+        List<PlayerDTO> result = importer.addPlayersFromGoogleSheet();
 
         // Assert
         assertThat(result).hasSize(1);
@@ -209,12 +179,11 @@ class PlayerServiceTest {
                         .swisstourLicense(false)
                         .build();
 
-        doReturn(List.of(sheetPlayer)).when(playerService).readGoogleSheet();
-        doReturn(List.of(dbPlayer)).when(playerService).findAll();
-        stubUpdate(1L);
+        doReturn(List.of(sheetPlayer)).when(importer).readGoogleSheet();
+        when(playerService.findAll()).thenReturn(List.of(dbPlayer));
 
         // Act
-        List<PlayerDTO> result = playerService.addPlayersFromGoogleSheet();
+        List<PlayerDTO> result = importer.addPlayersFromGoogleSheet();
 
         // Assert
         assertThat(result).hasSize(1);
@@ -244,12 +213,11 @@ class PlayerServiceTest {
                         .swisstourLicense(false)
                         .build();
 
-        doReturn(List.of(sheetPlayer)).when(playerService).readGoogleSheet();
-        doReturn(List.of(dbPlayer)).when(playerService).findAll();
-        stubUpdate(1L);
+        doReturn(List.of(sheetPlayer)).when(importer).readGoogleSheet();
+        when(playerService.findAll()).thenReturn(List.of(dbPlayer));
 
         // Act
-        List<PlayerDTO> result = playerService.addPlayersFromGoogleSheet();
+        List<PlayerDTO> result = importer.addPlayersFromGoogleSheet();
 
         // Assert
         assertThat(result).hasSize(1);
@@ -271,12 +239,11 @@ class PlayerServiceTest {
                         .swisstourLicense(true)
                         .build();
 
-        doReturn(List.of()).when(playerService).readGoogleSheet();
-        doReturn(List.of(dbPlayer)).when(playerService).findAll();
-        stubUpdate(1L);
+        doReturn(List.of()).when(importer).readGoogleSheet();
+        when(playerService.findAll()).thenReturn(List.of(dbPlayer));
 
         // Act
-        List<PlayerDTO> result = playerService.addPlayersFromGoogleSheet();
+        List<PlayerDTO> result = importer.addPlayersFromGoogleSheet();
 
         // Assert
         assertThat(result).hasSize(1);
@@ -305,12 +272,11 @@ class PlayerServiceTest {
                         .swisstourLicense(false)
                         .build();
 
-        doReturn(List.of(sheetPlayer)).when(playerService).readGoogleSheet();
-        doReturn(List.of(dbPlayer)).when(playerService).findAll();
-        stubUpdate(1L);
+        doReturn(List.of(sheetPlayer)).when(importer).readGoogleSheet();
+        when(playerService.findAll()).thenReturn(List.of(dbPlayer));
 
         // Act
-        List<PlayerDTO> result = playerService.addPlayersFromGoogleSheet();
+        List<PlayerDTO> result = importer.addPlayersFromGoogleSheet();
 
         // Assert
         assertThat(result).hasSize(1);
@@ -330,30 +296,35 @@ class PlayerServiceTest {
                         .swisstourLicense(true)
                         .build();
 
-        doReturn(List.of(sheetPlayer)).when(playerService).readGoogleSheet();
-        doReturn(List.of()).when(playerService).findAll();
+        doReturn(List.of(sheetPlayer)).when(importer).readGoogleSheet();
+        when(playerService.findAll()).thenReturn(List.of());
 
-        Player savedPlayer =
-                Player.builder()
-                        .id(1L)
-                        .firstname("Paul")
-                        .lastname("McBeth")
+        PlayerDTO withDetails =
+                PlayerDTO.builder()
                         .sdaNumber(1001L)
                         .pdgaNumber(27523L)
-                        .swisstourLicense(true)
+                        .firstname("Paul")
+                        .lastname("McBeth")
                         .isPro(false)
                         .build();
-        when(playerRepository.save(any())).thenReturn(savedPlayer);
-        when(playerRepository.findById(1L)).thenReturn(Optional.of(savedPlayer));
-        when(pdgaApiPlayerService.getPlayerInfo(27523L))
-                .thenReturn(pdgaApiPlayer("Paul", "McBeth", 27523L, "A"));
+        PlayerDTO created =
+                PlayerDTO.builder()
+                        .id(1L)
+                        .sdaNumber(1001L)
+                        .pdgaNumber(27523L)
+                        .firstname("Paul")
+                        .lastname("McBeth")
+                        .isPro(false)
+                        .build();
+        when(playerService.addDetails(sheetPlayer)).thenReturn(withDetails);
+        when(playerService.create(withDetails)).thenReturn(1L);
+        when(playerService.get(1L)).thenReturn(created);
 
         // Act
-        List<PlayerDTO> result = playerService.addPlayersFromGoogleSheet();
+        List<PlayerDTO> result = importer.addPlayersFromGoogleSheet();
 
         // Assert
-        verify(pdgaApiPlayerService).getPlayerInfo(27523L);
-        verify(playerRepository).save(any());
+        verify(playerService).create(withDetails);
         assertThat(result).hasSize(1);
         assertThat(result.get(0).getSdaNumber()).isEqualTo(1001L);
     }
@@ -388,47 +359,17 @@ class PlayerServiceTest {
                         .swisstourLicense(false)
                         .build();
 
-        doReturn(List.of(sheetPlayerMatched, sheetPlayerNew)).when(playerService).readGoogleSheet();
-        doReturn(List.of(dbPlayer)).when(playerService).findAll();
+        doReturn(List.of(sheetPlayerMatched, sheetPlayerNew)).when(importer).readGoogleSheet();
+        when(playerService.findAll()).thenReturn(List.of(dbPlayer));
 
-        Player existingEntity =
-                Player.builder()
-                        .id(1L)
-                        .firstname("Paul")
-                        .lastname("McBeth")
-                        .sdaNumber(1001L)
-                        .pdgaNumber(27523L)
-                        .swisstourLicense(false)
-                        .isPro(false)
-                        .build();
-        Player newEntity =
-                Player.builder()
-                        .id(2L)
-                        .firstname("Jane")
-                        .lastname("Doe")
-                        .sdaNumber(2001L)
-                        .swisstourLicense(true)
-                        .isPro(false)
-                        .build();
-
-        when(playerRepository.findById(1L)).thenReturn(Optional.of(existingEntity));
-        when(playerRepository.findById(2L)).thenReturn(Optional.of(newEntity));
-        when(playerRepository.save(any())).thenReturn(existingEntity).thenReturn(newEntity);
+        when(playerService.addDetails(sheetPlayerNew)).thenReturn(sheetPlayerNew);
+        when(playerService.create(sheetPlayerNew)).thenReturn(2L);
+        when(playerService.get(2L)).thenReturn(sheetPlayerNew);
 
         // Act
-        List<PlayerDTO> result = playerService.addPlayersFromGoogleSheet();
+        List<PlayerDTO> result = importer.addPlayersFromGoogleSheet();
 
         // Assert
         assertThat(result).hasSize(2);
-    }
-
-    // -------------------------------------------------------------------------
-    // Helpers
-    // -------------------------------------------------------------------------
-
-    private void stubUpdate(Long id) {
-        Player entity = Player.builder().id(id).swisstourLicense(false).isPro(false).build();
-        when(playerRepository.findById(id)).thenReturn(Optional.of(entity));
-        when(playerRepository.save(any())).thenReturn(entity);
     }
 }

@@ -1,6 +1,7 @@
 package dg.swiss.swiss_dg_db.player;
 
 import dg.swiss.swiss_dg_db.event.PlayerEventsDTO;
+import dg.swiss.swiss_dg_db.player.imports.GoogleSheetPlayerImporter;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -22,6 +23,7 @@ import org.springframework.web.bind.annotation.*;
 public class PlayerResource {
 
     private final PlayerService playerService;
+    private final GoogleSheetPlayerImporter googleSheetPlayerImporter;
     private static final Logger logger = LoggerFactory.getLogger(PlayerResource.class);
 
     @GetMapping
@@ -69,6 +71,6 @@ public class PlayerResource {
     public ResponseEntity<List<PlayerDTO>> addPlayersFromGoogleSheet()
             throws IOException, InterruptedException {
         logger.info("Updated SDA Licenses.");
-        return ResponseEntity.ok(playerService.addPlayersFromGoogleSheet());
+        return ResponseEntity.ok(googleSheetPlayerImporter.addPlayersFromGoogleSheet());
     }
 }
