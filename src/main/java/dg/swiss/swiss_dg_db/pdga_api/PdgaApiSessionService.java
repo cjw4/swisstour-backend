@@ -98,15 +98,14 @@ public class PdgaApiSessionService {
                 this.restClient
                         .post()
                         .uri("system/connect")
-                        .header(
-                                "Cookie",
-                                this.sessionName + "=" + this.sessionId,
-                                "X-CSRF-Token",
-                                this.token)
+                        .header(HttpHeaders.COOKIE, this.sessionName + "=" + this.sessionId)
+                        .header("X-CSRF-Token", this.token)
                         .accept(MediaType.APPLICATION_JSON)
                         .retrieve()
                         .body(ConnectionStatusResponse.class);
-        if (connectionStatus != null && connectionStatus.user.status == "1") {
+        if (connectionStatus != null
+                && connectionStatus.user() != null
+                && "1".equals(connectionStatus.user().status())) {
             return true;
         }
         return false;
